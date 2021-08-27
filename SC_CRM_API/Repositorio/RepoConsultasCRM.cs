@@ -30,8 +30,6 @@ namespace SC_CRM_API.Repositorio
                 return credenciales;
             else
                 return null;
-
-
      
         }
 

@@ -325,9 +325,10 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
     }
 
+    [Table("CRM_PRESUPUESTOS")]
     public class PresupuestoDeConsulta
     {
-
+        [Key]
         [Column("ID_Presupuesto")]                                                              //[int] NOT NULL,
         public int IdPresupuesto { get; set; }
 
@@ -417,16 +418,16 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public DateTime FechaDeCotizacion { get; set; }
 
         [Column("ID_Proyecto")]																	//[int] NULL,
-        public int IdProyecto { get; set; }
+        public int? IdProyecto { get; set; }
 
         [Column("COD_CLASIF")]																	//[varchar](6) NOT NULL,
         public string CodigoDeClasificacion { get; set; }
 
         [Column("ID_Contacto")]																	//[int] NULL,
-        public int IdDeContacto { get; set; }
+        public int? IdDeContacto { get; set; }
 
         [Column("ID_Referencia")]																//[int] NULL,
-        public int IdDeReferencia { get; set; }
+        public int? IdDeReferencia { get; set; }
 
         [Column("NRO_O_COMP")]																	//[varchar](14) NOT NULL,
         public string NumeroDEComprobante { get; set; }
@@ -465,7 +466,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string Perfil { get; set; }
 
         [Column("ID_subCategoria")]																//[int] NULL,
-        public int IdSubCategoria { get; set; }
+        public int? IdSubCategoria { get; set; }
 
         [Column("COD_ASIENTO_MODELO_GV")]														//[varchar](30) NOT NULL,
         public string CodigoAsientoModeloGv { get; set; }

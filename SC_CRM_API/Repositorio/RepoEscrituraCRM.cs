@@ -74,17 +74,6 @@ namespace SC_CRM_API.Repositorio
             transac.DireccionDeEntrega.Sucursal = transac.Sucursal;
             transac.DireccionDeEntrega.IdEvento = transac.IdGlobal;
 
-            //--ANTES DE ESCRIBIR VALIDO
-            /*
-            var validado = await validarTransaccion(transac);
-            if (validado.Any())
-            {
-                transac.ListaDeErrores.AddRange(validado);
-                transac.EscrituraExitosa = false;
-                return transac;
-            }*/
-
-
             Sucursal sucursal = await credencialesAsync(transac.Sucursal);
             string metodo = System.Reflection.MethodBase.GetCurrentMethod().Name;
             int salidaCliente = 0;

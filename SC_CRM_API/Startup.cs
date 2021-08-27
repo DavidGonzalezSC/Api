@@ -31,9 +31,12 @@ namespace SC_CRM_API
             //agregar cors
             services.AddCors();
             services.AddDbContext<SucursalesDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("Productivo")));
+            services.AddDbContext<MensajeriaDbContext>();
+
             services.AddScoped<IServiciosSucursales, ServicioSucursales>();
             services.AddScoped<IEscrituraCRM, RepoEscrituraCRM>();
             services.AddScoped<IConsultasCRM, RepoConsultasCRM>();
+            services.AddScoped<IMensajeria, RepoMensajeria>();
             services.AddControllers();
         }
 
