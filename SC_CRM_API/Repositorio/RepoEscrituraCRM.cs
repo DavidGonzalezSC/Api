@@ -71,8 +71,12 @@ namespace SC_CRM_API.Repositorio
             transac.Cliente.IdEvento = transac.IdGlobal;
             transac.Presupuesto.Sucursal = transac.Sucursal;
             transac.Presupuesto.IdEvento = transac.IdGlobal;
-            transac.DireccionDeEntrega.Sucursal = transac.Sucursal;
-            transac.DireccionDeEntrega.IdEvento = transac.IdGlobal;
+            foreach (var direccion in transac.DireccionesDeEntrega)
+            {
+                direccion.Sucursal = transac.Sucursal;
+                direccion.IdEvento = transac.IdGlobal;
+
+            }
 
             Sucursal sucursal = await credencialesAsync(transac.Sucursal);
             string metodo = System.Reflection.MethodBase.GetCurrentMethod().Name;
@@ -103,8 +107,12 @@ namespace SC_CRM_API.Repositorio
                             transac.ClienteSave = true;
                             //cliente escribio bien..pasamos a domicilio
                             //--domicilio
-                            transac.DireccionDeEntrega.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
-                            contextoDeEscritura.DireccionDeEntregas.Add(transac.DireccionDeEntrega);
+                            foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
+                            {
+                                direccion.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
+                                contextoDeEscritura.DireccionDeEntregas.Add(direccion);
+                            }
+
                             salidaCliente = contextoDeEscritura.SaveChanges();
 
                             var escritoDomicilio = EscribirDomicilioSP(transac.IdGlobal, contextoDeEscritura);
@@ -420,20 +428,20 @@ namespace SC_CRM_API.Repositorio
             return errores;
         }
 
-        public async Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direccion)
+        public async Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direcciones)
         {
             ValidarDireccionDeEntrega validarDireccion = new ValidarDireccionDeEntrega();
-            ValidationResult resultado = await validarDireccion.ValidateAsync(direccion);
             List<string> errores = new List<string>();
+            ValidationResult resultado = await validarDireccion.ValidateAsync(direcciones);
 
-            if (!resultado.IsValid)
-            {
-                foreach (var error in resultado.Errors)
+                if (!resultado.IsValid)
                 {
-                    string mensaje = "Falló la validación del Domicilio de Entrega en: " + error.PropertyName + " - Error: " + error.ErrorMessage;
-                    errores.Add(mensaje);
+                    foreach (var error in resultado.Errors)
+                    {
+                        string mensaje = "Falló la validación del Domicilio de Entrega en: " + error.PropertyName + " - Error: " + error.ErrorMessage;
+                        errores.Add(mensaje);
+                    }
                 }
-            }
 
             return errores;
         }
@@ -454,8 +462,12 @@ namespace SC_CRM_API.Repositorio
                 ListadoDeErrores.AddRange(erroresDetalle);
             }
 
-            var erroresDeDomicilio = await validarDomicDeEntrega(transaccion.DireccionDeEntrega);
-            ListadoDeErrores.AddRange(erroresDeDomicilio);
+            foreach (DireccionDeEntrega item in transaccion.DireccionesDeEntrega)
+            {
+                var erroresDeDomicilio = await validarDomicDeEntrega(item);
+                ListadoDeErrores.AddRange(erroresDeDomicilio);
+
+            }
 
             return ListadoDeErrores;
         }

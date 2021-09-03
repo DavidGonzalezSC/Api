@@ -38,14 +38,17 @@ namespace SC_CRM_API.Contextos
             
         }
 
-
+        //--Escritura
         public DbSet<Cliente> Clientes { get; set; }
-        public DbSet<ClienteDeConsulta> ClientesDeConsulta { get; set; }
         public DbSet<Presupuesto> Presupuestos { get; set; }
-        public DbSet<PresupuestoDeConsulta> PresupuestosParaConsulta { get; set; }
         public DbSet<Detalle> Detalles { get; set; }
-        public DbSet<DetalleDeConsulta> DetallesParaConsulta { get; set; }
         public DbSet<DireccionDeEntrega> DireccionDeEntregas { get; set; }
         public DbSet<SqlRespuesta> RespuestaEscritura { get; set; }
+
+        //--Lectura
+        public DbSet<ClienteDeConsulta> ClientesDeConsulta { get; set; }
+        public DbSet<DetalleDeConsulta> DetallesParaConsulta { get; set; }
+        public DbSet<PresupuestoDeConsulta> PresupuestosParaConsulta { get; set; }
+        public DbSet<DireccionDeEntregaDeConsulta> DireccionDeEntregaParaConsulta { get; set; }
     }
 }

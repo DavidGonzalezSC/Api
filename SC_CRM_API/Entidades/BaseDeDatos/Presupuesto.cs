@@ -439,7 +439,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public int TalonarioDePedidosDos { get; set; }
 
         [Column("ID_Acopio")]																	//[int] NULL,
-        public int IdDeAcopio { get; set; }
+        public int? IdDeAcopio { get; set; }
 
         [Column("ID_Sucursal")]																	//[int] NULL,
         public int IdDeSucursal { get; set; }
@@ -523,7 +523,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string CodigoPresupuestoNPS { get; set; }
 
         [Column("CA_ImporteOriginal", TypeName = "decimal(18,2)")]								//[decimal](18, 2) NULL,
-        public decimal ImporteOriginal { get; set; }
+        public decimal? ImporteOriginal { get; set; }
 
         [Column("CA_NPSMsgRespuesta")]															//[varchar](255) NULL,
         public string NpsMsgRespuesta { get; set; }

@@ -208,8 +208,16 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public decimal Cantidad_5 { get; set; }
 
 
+        //-- Agregado para los Domicilios por Renglon
+        public int? CA_ListaPrecios { get; set; }           //int null
+        public string CA_Descuento { get; set; }            // varchar(6)
+        public DateTime? CA_FechaEntrega { get; set; }      //datetime, null
+        public int? CA_IdDiereccionEntrega { get; set; }    //int null
+
     }
 
+
+    //--Directo para consultas
     [Table("CRM_PresupuestosDetalles")]
     public class DetalleDeConsulta
     {

@@ -62,8 +62,11 @@ namespace SC_CRM_API.Controllers
             {
                 transaccion.Detalles.Add(item);
             }
-            
-            transaccion.DireccionDeEntrega = transaccDto.DireccionDeEntrega;
+
+            foreach (DireccionDeEntrega direccion in transaccDto.DireccionDeEntrega)
+            {
+                transaccion.DireccionesDeEntrega.Add(direccion);
+            }
 
             var verificarTransaccion = await _escritura.validarTransaccion(transaccion);
             return Ok(verificarTransaccion);
@@ -83,7 +86,11 @@ namespace SC_CRM_API.Controllers
                 transaccion.Detalles.Add(item);
             }
 
-            transaccion.DireccionDeEntrega = transaccDto.DireccionDeEntrega;
+            foreach (DireccionDeEntrega direccion in transaccDto.DireccionDeEntrega)
+            {
+                transaccion.DireccionesDeEntrega.Add(direccion);
+            }
+
             var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion);
 
             //--Verificar que pasó

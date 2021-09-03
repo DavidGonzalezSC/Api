@@ -186,4 +186,107 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
 
     }
+
+
+    //--PARA consultas
+    [Table("CRM_Sucursales")]
+    public class DireccionDeEntregaDeConsulta
+    {
+
+        [Column("ID_Sucursal")]                           //[int] IDENTITY(1,1) NOT NULL,
+        public int Id { get; set; }
+
+        [Column("ID_Cliente")]                            //[int] NOT NULL,
+        public int IdCliente { get; set; }
+
+        [Column("Nombre")]                                //[varchar](50) NULL,
+        public string Nombre { get; set; }
+
+        [Column("Direccion")]                             //[varchar](50) NULL,
+        public string Direccion { get; set; }
+
+        [Column("CALLE")]                                 //[varchar](50) NOT NULL,
+        public string Calle { get; set; }
+
+        [Column("NRO_DOMIC")]                               //[varchar](10) NOT NULL,
+        public string Numero { get; set; }
+
+        [Column("PISO")]                                    //[varchar](10) NOT NULL,
+        public string Piso { get; set; }
+
+        [Column("DEPARTAMENTO_DOMIC")]                  //[varchar](10) NOT NULL,
+        public string Depto { get; set; }
+
+        [Column("Localidad")]                               //[varchar](30) NOT NULL,
+        public string Localidad { get; set; }
+
+        [Column("Provincia")]                               //[varchar](2) NOT NULL,
+        public string Provincia { get; set; }
+
+        [Column("C_Postal")]                                //[varchar](10) NULL,
+        public string CodPos { get; set; }
+
+        [Column("Telefono")]                                //[varchar](50) NULL,
+        public string Telefono { get; set; }
+
+        [Column("Fax")]                                 //[varchar](50) NULL,
+        public string Fax { get; set; }
+
+        [Column("Encargado")]								//[varchar](50) NULL,
+        public string Encargado { get; set; }
+
+        [Column("Horario")]								//[varchar](50) NULL,
+        public string Horario { get; set; }
+
+        [Column("eMail")]									//[varchar](50) NULL,
+        public string Email { get; set; }
+
+        [Column("ID_DIRECCION_ENTREGA")]					//[int] NULL,
+        public int IdDireccionEntrega { get; set; }
+
+        [Column("Observaciones")]							//[varchar](8000) NOT NULL,
+        public string Observaciones { get; set; }
+
+        [Column("ID_Calle")]								//[int] NULL,
+        public int? IdCalle { get; set; }
+
+        [Column("AL_FIJ_IB3")]							//[int] NOT NULL,
+        public int AlFijIb3 { get; set; }
+
+        [Column("ALI_ADI_IB")]							//[varchar](2) NOT NULL,
+        public string AliAdiIb { get; set; }
+
+        [Column("ALI_FIJ_IB")]							//[varchar](2) NOT NULL,
+        public string AliFijIb { get; set; }
+
+        [Column("IB_L")]									// [bit] NOT NULL,
+        public bool IbL { get; set; }
+
+        [Column("IB_L3")]									//[bit] NOT NULL,
+        public bool IbL3 { get; set; }
+
+        [Column("II_IB3")]								//[bit] NOT NULL,
+        public bool IiIb3 { get; set; }
+
+        [Column("LIB")]									//[varchar](1) NOT NULL,
+        public string Lib { get; set; }
+
+        [Column("PORC_L")]								//[decimal](18, 2) NOT NULL,
+        public decimal PorcL { get; set; }
+
+        [Column("Fecha_UltimaModificacion")]				//[datetime] NULL,
+        public DateTime? FechaUltimaModificacion { get; set; }
+
+        [Column("ID_Vendedor_UltimaModificacion")]		//[int] NULL,
+        public int? VendedorUltimaModif { get; set; }
+
+        [Column("Latitud")]								//[float] NOT NULL,
+        public double? Lat { get; set; }
+
+        [Column("Longitud")]								//[float] NOT NULL,
+        public double? Long { get; set; }
+
+
+
+    }
 }

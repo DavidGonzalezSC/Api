@@ -20,6 +20,18 @@ namespace SC_CRM_API.Interfaces
 
         //--TODO en clientes
         //Cliente + ultimo presupuesto
+        Task<List<PresupuestoDeConsulta>> buscarPresupuestosPorCliente(string sucursal, string idCliente);
+        Task<List<DireccionDeEntregaDeConsulta>> buscarDomiciliosPorCliente(string sucursal, string idCliente);
+        Task<List<DetalleDeConsulta>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto);
+
+
+
+        
+
+            //--Cliente me puede traer una lista -> por ID
+
+
+
         //Cliente + todos los presu
         //
 

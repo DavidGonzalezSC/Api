@@ -9,8 +9,6 @@ using System.Text;
 namespace SC_CRM_API.Entidades.BaseDeDatos
 {
 
-   
-
     public class ValidarCliente : AbstractValidator<Cliente>
     {
         public ValidarCliente()
@@ -496,6 +494,8 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string CaSocioAA { get; set; }
     }
 
+
+    //--Directo de DB para consultas
     [Table("CRM_CLIENTES")]
     public class ClienteDeConsulta
     {

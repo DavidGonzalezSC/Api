@@ -35,7 +35,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public Cliente Cliente { get; set; } = new Cliente(_sucursal, _guid);
         public Presupuesto Presupuesto { get; set; } = new Presupuesto(_sucursal, _guid);
         public List<Detalle> Detalles { get; set; } = new List<Detalle>();
-        public DireccionDeEntrega DireccionDeEntrega { get; set; } = new DireccionDeEntrega(_sucursal, _guid);
+        public List<DireccionDeEntrega> DireccionesDeEntrega { get; set; } = new List<DireccionDeEntrega>();
         
     }
 }

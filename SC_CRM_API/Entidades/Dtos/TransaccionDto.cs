@@ -11,6 +11,6 @@ namespace SC_CRM_API.Entidades.Dtos
         public ClienteDto Cliente { get; set; } = new ClienteDto();
         public PresupuestoDto Presupuesto { get; set; } = new PresupuestoDto();
         public List<DetalleDto> DetallesDto { get; set; } = new List<DetalleDto>();
-        public DireccionDeEntregaDto DireccionDeEntrega { get; set; } = new DireccionDeEntregaDto();
+        public List<DireccionDeEntregaDto> DireccionDeEntrega { get; set; } = new List<DireccionDeEntregaDto>();
     }
 }

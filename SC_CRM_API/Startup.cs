@@ -58,6 +58,8 @@ namespace SC_CRM_API
             {
                 endpoints.MapControllers();
             });
+
+
         }
     }
 }

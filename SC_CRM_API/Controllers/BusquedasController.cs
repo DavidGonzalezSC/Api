@@ -19,6 +19,7 @@ namespace SC_CRM_API.Controllers
             _consultas = consultas;
         }
 
+        //--Busquedas Referentes a Clientes
         [HttpGet("{sucursal}/clienteExiste/{cuit}")] //--LISTO
         public async Task<IActionResult> clienteExiste([FromRoute] string sucursal, [FromRoute] string cuit)
         {
@@ -93,6 +94,40 @@ namespace SC_CRM_API.Controllers
             var clientePorNombre = await _consultas.buscarClientePorRazonSocialQueComienzanConAsync(sucursal, busqueda);
             return Ok(clientePorNombre);
 
+        }
+
+        //--Busquedas de Presupuestos
+        [HttpGet("{sucursal}/listaPresupuestosPorClienteId/{Id}")] //--
+        public async Task<IActionResult> listaDeCabeceraDePresupuestoPorCliente([FromRoute] string sucursal, [FromRoute] string Id)
+        {
+            var presupuestos = await _consultas.buscarPresupuestosPorCliente(sucursal, Id);
+            if (presupuestos.Count > 0)
+                return Ok(presupuestos);
+            else
+                return NotFound();
+        }
+
+        //--Busquedas de Direcciones
+        [HttpGet("{sucursal}/listaDireccionesPorClienteId/{Id}")] //--
+        public async Task<IActionResult> listaDeDireccionesPorCliente([FromRoute] string sucursal, [FromRoute] string Id)
+        {
+            var direcciones = await _consultas.buscarDomiciliosPorCliente(sucursal, Id);
+            if (direcciones.Count() > 0)
+                return Ok(direcciones);
+            else
+                return NotFound();
+
+        }
+
+        //--Busquedas de Renglones de Detalles
+        [HttpGet("{sucursal}/renglonesDelpresupuesto/{IdPresupuesto}")] //--
+        public async Task<IActionResult> renglonesDelPresupuesto([FromRoute] string sucursal, [FromRoute] string IdPresupuesto)
+        {
+            var renglones = await _consultas.buscarDetallesPorPresupuesto(sucursal, IdPresupuesto);
+            if (renglones.Count() > 0)
+                return Ok(renglones);
+            else
+                return NotFound();
         }
 
     }

@@ -13,7 +13,6 @@ namespace SC_CRM_API.Interfaces
         public Task<IEnumerable<string>> validarCabecera(Presupuesto presupuesto);
         public Task<IEnumerable<string>> validarDetalle(Detalle detalle);
         public Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direccion);
-
         public Task<IEnumerable<string>> validarTransaccion(Transaccion transaccion);
     }
 }

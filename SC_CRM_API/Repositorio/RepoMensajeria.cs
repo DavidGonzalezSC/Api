@@ -5,10 +5,12 @@ using SC_CRM_API.Entidades.Dtos;
 using SC_CRM_API.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Net.Mime;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SC_CRM_API.Repositorio
@@ -39,24 +41,46 @@ namespace SC_CRM_API.Repositorio
 
         public async Task<bool> confeccionarMail(MailDto parametros)
         {
-            PresupuestoDeConsulta presupuesto = new PresupuestoDeConsulta();
-            List<DetalleDeConsulta> renglones = new List<DetalleDeConsulta>();
-            ClienteDeConsulta cliente = new ClienteDeConsulta();
+
 
             Sucursal contexto = await credencialesAsync(parametros.Sucursal);
+            if (contexto == null)
+                return false;
+
+            PresupuestoDevueltoDbDto presupuestoAImprimir = new PresupuestoDevueltoDbDto();
+            presupuestoAImprimir.NumeroPedido = parametros.Presupuesto;
+            presupuestoAImprimir.Sucursal = parametros.Sucursal;
 
             //--Levantar Data
             await using (var _crmDbContext = new CrmContexto(contexto))
             {
-                presupuesto = await _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == parametros.Presupuesto).FirstOrDefaultAsync();
-                renglones = await _crmDbContext.DetallesParaConsulta.Where(i => i.IdPresupuesto == parametros.Presupuesto).ToListAsync();
-                cliente = await _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuesto.IdCliente).FirstOrDefaultAsync();
+                presupuestoAImprimir.Presupuesto = await _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == parametros.Presupuesto).FirstOrDefaultAsync();
+                presupuestoAImprimir.DetallesDto = await _crmDbContext.DetallesParaConsulta.Where(i => i.IdPresupuesto == parametros.Presupuesto).ToListAsync();
+                presupuestoAImprimir.Cliente = await _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuestoAImprimir.Presupuesto.IdCliente).FirstOrDefaultAsync();
             }
 
-            if (presupuesto == null || renglones.Count < 1)
+            if (presupuestoAImprimir.Presupuesto == null || presupuestoAImprimir.DetallesDto.Count < 1)
                 return false;
 
 
+            //escribir el archivo json con la data
+            string nombreArchivo = presupuestoAImprimir.Sucursal + "_" + presupuestoAImprimir.Identificador + ".txt";
+            string pati_json = AppDomain.CurrentDomain.BaseDirectory + $"\\Json\\{nombreArchivo}";
+            using FileStream crearStream = File.Create(pati_json);
+            await JsonSerializer.SerializeAsync(crearStream, presupuestoAImprimir);
+
+            EjecutarCreacionPDF(nombreArchivo);
+
+
+
+            //if (enviado)
+            return true;
+            //else
+              ///  return false;
+        }
+
+        public async Task<bool> crear_cuerpoAsync(TransaccionDto transacc, MailDto parametros)
+        {
             //--Levantar Plantilla
             string path = AppDomain.CurrentDomain.BaseDirectory + "\\Plantillas\\" + parametros.Plantilla + ".html";
             string plantilla = "";
@@ -74,14 +98,14 @@ namespace SC_CRM_API.Repositorio
 
 
             //--Reemplazar en la plantilla
-            string reemplazo_1 = plantilla.Replace("**CONTACTO**", cliente.RazonSocial);
+            string reemplazo_1 = plantilla.Replace("**CONTACTO**", transacc.Cliente.RazonSocial);
 
-            foreach (var renglon in renglones)
+            foreach (var renglon in transacc.DetallesDto)
             {
                 string agregar = constante.Replace("**SKU**", renglon.CodigoArticulo);
                 string agregar_2 = agregar.Replace("**DESCRIPCION**", renglon.Descripcion);
-                string agregar_3 = agregar_2.Replace("**CANTIDAD**", renglon.Cantidad.ToString());
-                string agregar_4 = agregar_3.Replace("**IMPORTE**", renglon.Precio.ToString());
+                string agregar_3 = agregar_2.Replace("**CANTIDAD**", Math.Truncate(renglon.Cantidad).ToString());
+                string agregar_4 = agregar_3.Replace("**IMPORTE**", Math.Truncate(renglon.Precio).ToString());
                 renglonesParaAgregar += agregar_4;
             }
 
@@ -100,13 +124,10 @@ namespace SC_CRM_API.Repositorio
             mensaje.TmeStamp = DateTime.Now;
             mensaje.Usuario = Environment.UserName;
 
-            //var enviado = await guardarParaEnvio(mensaje);
-            envioDirecto(mensaje);
+            //enviar mail
 
-            //if (enviado)
-                return true;
-            //else
-              ///  return false;
+            return true;
+
         }
 
         public async Task<bool> guardarParaEnvio(Email mensaje)
@@ -142,6 +163,37 @@ namespace SC_CRM_API.Repositorio
         }
 
 
+        //--Ejecutar un comando??
+        static void EjecutarCreacionPDF(string parametro)
+        {
+            
+            ProcessStartInfo processInfo;
+            Process proceso;
+
+            processInfo = new ProcessStartInfo("cmd.exe", "/c " + parametro);
+            processInfo.CreateNoWindow = true;
+            processInfo.UseShellExecute = false;
+
+            //-- Redireccionar la salida estandard por ahora..luego a un log o algo
+            processInfo.RedirectStandardError = true;
+            processInfo.RedirectStandardOutput = true;
+
+            proceso = Process.Start(processInfo);
+
+            //-- Capturar la Salidas
+            proceso.OutputDataReceived += (object sender, DataReceivedEventArgs e) => Console.WriteLine("Salida ->" + e.Data);
+            proceso.BeginOutputReadLine();
+
+            proceso.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>  Console.WriteLine("Errores->" + e.Data);
+            proceso.BeginErrorReadLine();
+
+            proceso.WaitForExit();
+
+            Console.WriteLine("CodSalida: {0}", proceso.ExitCode);
+            proceso.Close();
+
+        }
+
         //--prueba delista blanca + salida directa
         public void envioDirecto(Email mensaje)
         {
@@ -151,7 +203,7 @@ namespace SC_CRM_API.Repositorio
                 using(MailMessage mail = new MailMessage())
                 { 
 
-                    mail.From = new MailAddress("Guille_El_Loco@sommiercenter.com");
+                    mail.From = new MailAddress("Pruebas_Desarrollo@sommiercenter.com");
                     mail.To.Add(mensaje.Para);
                     mail.Bcc.Add("gabriel.ceravolo@sommiercnter.com");
                     mail.CC.Add("emanuel.villalva@sommiercnter.com");

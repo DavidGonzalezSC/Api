@@ -103,5 +103,38 @@ namespace SC_CRM_API.Repositorio
 
             }
         }
+
+        public async Task<List<PresupuestoDeConsulta>> buscarPresupuestosPorCliente(string sucursal, string idCliente)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                return _crmDbContext.PresupuestosParaConsulta.Where(c => c.IdCliente == Convert.ToInt32(idCliente.Trim())).ToList();
+
+            }
+        }
+
+        public async Task<List<DireccionDeEntregaDeConsulta>> buscarDomiciliosPorCliente(string sucursal, string idCliente)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                return _crmDbContext.DireccionDeEntregaParaConsulta.Where(c => c.IdCliente == Convert.ToInt32(idCliente.Trim())).ToList();
+
+            }
+        }
+
+        public async Task<List<DetalleDeConsulta>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                return _crmDbContext.DetallesParaConsulta.Where(c => c.IdPresupuesto == Convert.ToInt32(idPresupuesto.Trim())).ToList();
+
+            }
+        }
     }
 }
