@@ -101,10 +101,7 @@ namespace SC_CRM_API.Controllers
         public async Task<IActionResult> listaDeCabeceraDePresupuestoPorCliente([FromRoute] string sucursal, [FromRoute] string Id)
         {
             var presupuestos = await _consultas.buscarPresupuestosPorCliente(sucursal, Id);
-            if (presupuestos.Count > 0)
-                return Ok(presupuestos);
-            else
-                return NotFound();
+            return Ok(presupuestos);
         }
 
         //--Busquedas de Direcciones
@@ -112,10 +109,7 @@ namespace SC_CRM_API.Controllers
         public async Task<IActionResult> listaDeDireccionesPorCliente([FromRoute] string sucursal, [FromRoute] string Id)
         {
             var direcciones = await _consultas.buscarDomiciliosPorCliente(sucursal, Id);
-            if (direcciones.Count() > 0)
-                return Ok(direcciones);
-            else
-                return NotFound();
+              return Ok(direcciones);
 
         }
 
@@ -128,6 +122,32 @@ namespace SC_CRM_API.Controllers
                 return Ok(renglones);
             else
                 return NotFound();
+        }
+
+        //-- endpoiunt que traiga cvabecera y detalle segun Id y Numero
+        [HttpGet("{sucursal}/presupuesto/{IdPresupuesto}")]
+        public async Task<IActionResult> obtenerPresupuesto([FromRoute] string sucursal, [FromRoute] string IdPresupuesto)
+        {
+            var presupuesto = await _consultas.obtenerPresupuesto(sucursal, IdPresupuesto);
+            if (presupuesto != null)
+                return Ok(presupuesto);
+            else
+                return NotFound();
+
+        }
+
+
+
+        //--PEDIDOS
+        [HttpGet("{sucursal}/pedidos/{Talonario}/{NroPedido}")]
+        public async Task<IActionResult> obtenerPedido([FromRoute] string sucursal, [FromRoute] Int16 Talonario, [FromRoute] string NroPedido)
+        {
+            var pedido = await _consultas.buscarPedido(sucursal,Talonario, NroPedido);
+
+            if (pedido.Cabecera.TalonPedido == 0 && string.IsNullOrEmpty(pedido.Cabecera.Nro_Pedido))
+                return NotFound();
+            else
+                return Ok(pedido);
         }
 
     }

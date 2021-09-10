@@ -35,6 +35,8 @@ namespace SC_CRM_API.Contextos
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SqlRespuesta>().HasNoKey();
+            modelBuilder.Entity<SqlRespuestaDomicilios>().HasNoKey();
+            modelBuilder.Entity<PedidoDeConsulta>().HasNoKey();
             
         }
 
@@ -44,11 +46,13 @@ namespace SC_CRM_API.Contextos
         public DbSet<Detalle> Detalles { get; set; }
         public DbSet<DireccionDeEntrega> DireccionDeEntregas { get; set; }
         public DbSet<SqlRespuesta> RespuestaEscritura { get; set; }
+        public DbSet<SqlRespuestaDomicilios> RespuestaEscrituraDeDomicilios { get; set; }
 
         //--Lectura
         public DbSet<ClienteDeConsulta> ClientesDeConsulta { get; set; }
         public DbSet<DetalleDeConsulta> DetallesParaConsulta { get; set; }
         public DbSet<PresupuestoDeConsulta> PresupuestosParaConsulta { get; set; }
         public DbSet<DireccionDeEntregaDeConsulta> DireccionDeEntregaParaConsulta { get; set; }
+        public DbSet <PedidoDeConsulta> PedidosParaConsulta { get; set; }
     }
 }

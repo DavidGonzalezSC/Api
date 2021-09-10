@@ -62,9 +62,7 @@ namespace SC_CRM_API.Repositorio
                 return null;
         }
 
-      
-
-        public async Task<Transaccion> GuardarTransaccionAsyncV2(Transaccion transac)
+        public async Task<Transaccion> GuardarTransaccionAsyncV2(Transaccion transac, bool PasarAPedido)
         {
 
             transac.Cliente.Sucursal = transac.Sucursal;
@@ -107,19 +105,30 @@ namespace SC_CRM_API.Repositorio
                             transac.ClienteSave = true;
                             //cliente escribio bien..pasamos a domicilio
                             //--domicilio
-                            foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
+                            List<SqlRespuestaDomicilios> listaDeEscritoDomicilio = new List<SqlRespuestaDomicilios>();
+
+                            if (transac.DireccionesDeEntrega.Count > 0)
                             {
-                                direccion.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
-                                contextoDeEscritura.DireccionDeEntregas.Add(direccion);
+                                foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
+                                {
+                                    direccion.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
+                                    contextoDeEscritura.DireccionDeEntregas.Add(direccion);
+                                }
+
+                                salidaCliente = contextoDeEscritura.SaveChanges();
+                                listaDeEscritoDomicilio = EscribirDomicilioSP(transac.IdGlobal, contextoDeEscritura).ToList();
+
+                            }else
+                            {
+                                var escritoDomicilio = new SqlRespuesta();
+                                escritoDomicilio.Comprobante = "0";
+                                
                             }
 
-                            salidaCliente = contextoDeEscritura.SaveChanges();
 
-                            var escritoDomicilio = EscribirDomicilioSP(transac.IdGlobal, contextoDeEscritura);
-
-                            if (string.IsNullOrEmpty(escritoDomicilio.Comprobante))
+                            if (string.IsNullOrEmpty(listaDeEscritoDomicilio.First().Comprobante))
                             {
-                                transac.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: {escritoDomicilio.Error_Mensaje}");
+                                transac.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: BUN");
                                 transac.EscrituraExitosa = false;
                                 transaccion.Rollback();
                                 transaccion.Dispose();
@@ -127,11 +136,13 @@ namespace SC_CRM_API.Repositorio
                             }
                             else
                             {
+
+
                                 //domicilio escribio bien pasamos al presupuesto
                                 transac.DomicEntregaSave = true;
-                                transac.Presupuesto.IdDeSucursal = Convert.ToInt32(escritoDomicilio.Comprobante); //paso el dato del cliente
+
+                                transac.Presupuesto.IdDeSucursal = Convert.ToInt32(0); //paso el dato del cliente
                                 transac.Presupuesto.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato del cliente
-                                
 
                                 contextoDeEscritura.Presupuestos.Add(transac.Presupuesto);
                                 salidaCliente = contextoDeEscritura.SaveChanges();
@@ -141,6 +152,11 @@ namespace SC_CRM_API.Repositorio
 
                                     detalle.Sucursal = transac.Sucursal;
                                     detalle.IdEvento = transac.IdGlobal;
+
+                                    detalle.CA_IdDireccionEntrega = Convert.ToInt32(listaDeEscritoDomicilio
+                                        .Where(d => d.NombreDomicilio == detalle.NombreDomicilio)
+                                        .FirstOrDefault().Comprobante.Trim());
+
                                     contextoDeEscritura.Detalles.Add(detalle);
 
                                 }
@@ -162,25 +178,33 @@ namespace SC_CRM_API.Repositorio
                                     transac.PresupuestoSave = true;
                                     transac.EscrituraExitosa = true;
 
+
                                     //verificar la escritura en tango
-                                    var listadoDeTango = EscribirEnTango(transac.IdGlobal, contextoDeEscritura);
+                                    if (PasarAPedido)
+                                    {
+                                        var listadoDeTango = EscribirEnTango(transac.IdGlobal, contextoDeEscritura);
+                                        transac.TangoSave = true;
+
+                                        foreach (SqlRespuesta pedido in listadoDeTango)
+                                        {
+                                            if (pedido.Resultado.Contains("Error"))
+                                            {
+                                                transac.TangoSave = false;
+                                                transac.ListaDeErrores.Add($"Llamada: SP de Tango - ERROR SQL: {pedido.Error_Mensaje}");
+                                            }else
+                                            {
+                                                transac.ListaDePedidos.Add(pedido.Comprobante);
+                                           
+                                            }
+                                        
+                                        }
+
+                                    }else
+                                    {
+                                        transac.TangoSave = true;
+                                    }
                                     //---------------------------
 
-                                    transac.TangoSave = true;
-
-                                    foreach (SqlRespuesta pedido in listadoDeTango)
-                                    {
-                                        if (pedido.Resultado.Contains("Error"))
-                                        {
-                                            transac.TangoSave = false;
-                                            transac.ListaDeErrores.Add($"Llamada: SP de Tango - ERROR SQL: {pedido.Error_Mensaje}");
-                                        }else
-                                        {
-                                            transac.ListaDePedidos.Add(pedido.Comprobante);
-                                           
-                                        }
-                                        
-                                    }
 
                                     if (!transac.TangoSave)
                                     {
@@ -212,12 +236,88 @@ namespace SC_CRM_API.Repositorio
             }
         }
 
+
+        public async Task<Transaccion> EscribirSoloEnTemporalParaPruebas(Transaccion transac)
+        {
+
+            transac.Cliente.Sucursal = transac.Sucursal;
+            transac.Cliente.IdEvento = transac.IdGlobal;
+            transac.Presupuesto.Sucursal = transac.Sucursal;
+            transac.Presupuesto.IdEvento = transac.IdGlobal;
+            foreach (var direccion in transac.DireccionesDeEntrega)
+            {
+                direccion.Sucursal = transac.Sucursal;
+                direccion.IdEvento = transac.IdGlobal;
+
+            }
+
+            Sucursal sucursal = await credencialesAsync(transac.Sucursal);
+            string metodo = System.Reflection.MethodBase.GetCurrentMethod().Name;
+            int salidaCliente = 0;
+
+            await using (var contextoDeEscritura = new CrmContexto(sucursal))
+            {
+
+                try
+                {
+                    using (var transaccion = contextoDeEscritura.Database.BeginTransaction())
+                    {
+
+                        //Guardar Cliente en la Temporal
+                        contextoDeEscritura.Clientes.Add(transac.Cliente);
+                        salidaCliente = contextoDeEscritura.SaveChanges();
+                        
+
+                        //-- Guardar Direcciones de entrega
+                        foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
+                           contextoDeEscritura.DireccionDeEntregas.Add(direccion);
+
+                        salidaCliente = contextoDeEscritura.SaveChanges();
+
+                        //--Guardo Presupuesto Cabecera
+                        contextoDeEscritura.Presupuestos.Add(transac.Presupuesto);
+                        salidaCliente = contextoDeEscritura.SaveChanges();
+
+                        //-- Guardo Detalles
+                        foreach (Detalle detalle in transac.Detalles)
+                        {
+                            detalle.Sucursal = transac.Sucursal;
+                            detalle.IdEvento = transac.IdGlobal;
+                            contextoDeEscritura.Detalles.Add(detalle);
+                        }
+
+                        salidaCliente = contextoDeEscritura.SaveChanges();
+
+
+                        //--Fin de Transaccion
+                        transaccion.Commit();
+                        transac.EscrituraExitosa = true;
+
+
+
+                    }
+                        
+
+                }
+                catch (DbUpdateException ex)
+                {
+                    Console.WriteLine(ex);
+                    transac.EscrituraExitosa = false;
+
+                }
+
+                return transac;
+
+
+            }
+        }
+
         private IEnumerable<SqlRespuesta> EscribirEnTango(Guid guid, CrmContexto crmContexto)
         {
             var listaDeDatos = new List<SqlRespuesta>();
-            var spClienteTango = new SqlRespuesta();
-            var spDireccionTango = new SqlRespuesta();
-            var spPresupuestoTango = new SqlRespuesta();
+            SqlRespuesta spClienteTango;
+            SqlRespuesta spDireccionTango;
+            SqlRespuesta spPresupuestoTango;
 
             try
             {
@@ -285,8 +385,6 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-
-
         private SqlRespuesta EscribirClienteSP(Guid guid, CrmContexto crmContexto)
         {
             var spEscribeCliente = new SqlRespuesta();
@@ -343,32 +441,35 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-        private SqlRespuesta EscribirDomicilioSP(Guid guid, CrmContexto crmContexto)
+        private IEnumerable<SqlRespuestaDomicilios> EscribirDomicilioSP(Guid guid, CrmContexto crmContexto)
         {
-            var spEscribeCliente = new SqlRespuesta();
+
+            List<SqlRespuestaDomicilios> ListadoDeDomicilios = new List<SqlRespuestaDomicilios>();
+
+            var spEscribeCliente = new SqlRespuestaDomicilios();
 
             try
             {
-
-                spEscribeCliente = crmContexto.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_SC_CRM_SUCURSALES '{guid}';").AsEnumerable().FirstOrDefault();
-
+                ListadoDeDomicilios = crmContexto.Set<SqlRespuestaDomicilios>().FromSqlRaw($"EXECUTE dbo.SP_SC_CRM_SUCURSALES '{guid}';").AsEnumerable().ToList();
             }
             catch (Exception error)
             {
-                spEscribeCliente = new SqlRespuesta
+                spEscribeCliente = new SqlRespuestaDomicilios
                 {
                     Resultado = "Catch",
                     Comprobante = "",
                     Fecha = DateTime.Now,
                     Error_Mensaje = error.Message,
                     Error_Severidad = "0",
-                    Error_Estado = "0"
+                    Error_Estado = "0",
+                    NombreDomicilio = "Error"
                 };
 
+                ListadoDeDomicilios.Add(spEscribeCliente);
 
             }
 
-            return spEscribeCliente;
+            return ListadoDeDomicilios;
 
         }
 

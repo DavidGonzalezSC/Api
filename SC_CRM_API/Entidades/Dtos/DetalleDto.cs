@@ -8,6 +8,7 @@ namespace SC_CRM_API.Entidades.Dtos
 {
     public class DetalleDto : Detalle
     {
-   
+        
+
     }
 }

@@ -442,7 +442,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public int? IdDeAcopio { get; set; }
 
         [Column("ID_Sucursal")]																	//[int] NULL,
-        public int IdDeSucursal { get; set; }
+        public int? IdDeSucursal { get; set; }
 
         [Column("Privado")]																		//[varchar](1) NOT NULL,
         public string Privado { get; set; }

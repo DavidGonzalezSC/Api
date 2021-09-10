@@ -91,7 +91,8 @@ namespace SC_CRM_API.Controllers
                 transaccion.DireccionesDeEntrega.Add(direccion);
             }
 
-            var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion);
+            //var escribio = await _escritura.EscribirSoloEnTemporalParaPruebas(transaccion);
+            var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion, false);
 
             //--Verificar que pasó
             if (!escribio.EscrituraExitosa)

@@ -1,4 +1,5 @@
 ﻿using SC_CRM_API.Entidades.BaseDeDatos;
+using SC_CRM_API.Entidades.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,29 +19,25 @@ namespace SC_CRM_API.Interfaces
         Task<IEnumerable<ClienteDeConsulta>> buscarClientePorRazonSocialQueComienzanConAsync(string sucursal, string cadenaDeBusqueda); //--Listo
 
 
-        //--TODO en clientes
-        //Cliente + ultimo presupuesto
+        
+        //--PRESUPUESTO
         Task<List<PresupuestoDeConsulta>> buscarPresupuestosPorCliente(string sucursal, string idCliente);
         Task<List<DireccionDeEntregaDeConsulta>> buscarDomiciliosPorCliente(string sucursal, string idCliente);
         Task<List<DetalleDeConsulta>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto);
+        Task<PresupuestoDevueltoDbDto> obtenerPresupuesto(string sucursal, string IdPresupuesto);
+        //-- Todo: PRESUPUESTO POR NUMERO
 
 
 
-        
-
-            //--Cliente me puede traer una lista -> por ID
-
-
-
-        //Cliente + todos los presu
-        //
+        //--PEDIDO
+        Task<PedidoDeConsultaDto> buscarPedido(string sucursal, Int16 Talonario, string NroDePedido);
+       // pedidos por presu
+         //   pedidos por cliente
 
 
 
-        //--- PRESUPUESTOS -----
-        //busqueda por numero
-        //busqueda por fecha
-        //por cliente
+
+
 
 
 

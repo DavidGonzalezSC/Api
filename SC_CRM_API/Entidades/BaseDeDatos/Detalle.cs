@@ -189,7 +189,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("Campo2")]								//[varchar] (2000) NOT NULL,
         public string Campo_2 { get; set; }
 
-        [Column("Campo3")]								//[varchar] (2000) NOT NULL,
+        [Column("Campo3")]								//[varchar] (2000) NOT NULL, //se va a guardar el codigo de transporte
         public string Campo_3 { get; set; }
 
         [Column("Campo4")]								//[datetime] NULL,
@@ -207,15 +207,31 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("Cantidad5")]								//[decimal](18, 5) NOT NULL,
         public decimal Cantidad_5 { get; set; }
 
-
         //-- Agregado para los Domicilios por Renglon
-        public int? CA_ListaPrecios { get; set; }           //int null
-        public string CA_Descuento { get; set; }            // varchar(6)
-        public DateTime? CA_FechaEntrega { get; set; }      //datetime, null
-        public int? CA_IdDiereccionEntrega { get; set; }    //int null
+        [Column("CA_ListaPrecios")]
+        public int? CodigoListaPrecio { get; set; }           //int null
+
+        [Column("CA_Descuento")]
+        public string CodigoDescuento { get; set; }            // varchar(6)
+
+        [Column("CA_FechaEntrega")]
+        public DateTime? FechaEntrega { get; set; }      //datetime, null
+
+        public int? CA_IdDireccionEntrega { get; set; }    //int null
+
+        [Column("CA_AnchoME")]
+        public int? Ancho_ME { get; set; }
+
+        [Column("CA_LargoME")]
+        public int? Largo_ME { get; set; }
+
+        [Column("CA_EspesorME")]
+        public int? Espesor_ME { get; set; }
+
+        [NotMapped]
+        public string NombreDomicilio { get; set; } //utilizado para pasar la definicion desde el renglon de domicilio y matchear cuando se escriben con el Id retiornado por el SP de sucursales
 
     }
-
 
     //--Directo para consultas
     [Table("CRM_PresupuestosDetalles")]
@@ -337,5 +353,28 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         [Column("Cantidad5")]								//[decimal](18, 5) NOT NULL,
         public decimal Cantidad_5 { get; set; }
+
+        //-- Agregado para los Domicilios por Renglon
+        [Column("CA_ListaPrecios")]
+        public int? CodigoListaPrecio { get; set; }           //int null
+
+        [Column("CA_Descuento")]
+        public string CodigoDescuento { get; set; }            // varchar(6)
+
+        [Column("CA_FechaEntrega")]
+        public DateTime? FechaEntrega { get; set; }      //datetime, null
+
+        [Column("CA_IdDireccionEntrega")]
+        public int? CA_IdDireccionEntrega { get; set; }    //int null
+
+        [Column("CA_AnchoME")]
+        public int? Ancho_ME { get; set; }
+
+        [Column("CA_LargoME")]
+        public int? Largo_ME { get; set; }
+
+        [Column("CA_EspesorME")]
+        public int? Espesor_ME { get; set; }
     }
 }
+
