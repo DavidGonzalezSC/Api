@@ -131,6 +131,57 @@ namespace SC_CRM_API.Controllers
 
         }
 
+        [HttpPost("{cadena}/escribirDomicilios")] //--LISTO
+        public async Task<IActionResult> escribirDomicilios([FromRoute] string cadena, [FromBody] TransaccionDomiciliosDto transacDomicDto)
+        {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.ErrorCount);
+
+
+            var transaccion = new TransaccionEscrituraDomicilios(cadena);
+            transaccion.IdCliente = transacDomicDto.IdDeCliente;
+
+            foreach (DireccionDeEntrega direccion in transacDomicDto.DireccionDeEntrega)
+            {
+                transaccion.DireccionesDeEntrega.Add(direccion);
+            }
+
+            var escribio = await _escritura.EscribirSoloDomicilios(transaccion);
+
+            //--Verificar que pasó
+            if (!escribio.EscrituraExitosa)
+            {
+                //--Bun
+                string mensaje = "";
+                //--JSONIFICAR
+                string json = Newtonsoft.Json.JsonConvert.SerializeObject(transaccion);
+                //--Escribir un Log
+                _escritura.EscribirLogs(cadena, json);
+
+
+                if (escribio.ListaDeErrores.Any())
+                {
+                    return Ok(escribio.ListaDeErrores);
+
+                }
+                else
+                {
+                    if (!escribio.EscrituraExitosa)
+                        mensaje = "Errores en los Domicilios";
+                }
+
+
+                return Ok(mensaje);
+
+            }
+            else
+            {
+                return Ok(escribio.ListaDeDomicilios);
+            }
+
+        }
+
 
     }
 }

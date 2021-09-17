@@ -62,6 +62,92 @@ namespace SC_CRM_API.Repositorio
                 return null;
         }
 
+        public async Task<TransaccionEscrituraDomicilios> EscribirSoloDomicilios(TransaccionEscrituraDomicilios transaccion)
+        {
+            Sucursal sucursal = await credencialesAsync(transaccion.Sucursal);
+            string metodo = System.Reflection.MethodBase.GetCurrentMethod().Name;
+
+            foreach (var direccion in transaccion.DireccionesDeEntrega) //-- Verificar si al menos una tiene el Id de Cliente
+            {
+                direccion.IdCliente = transaccion.IdCliente;
+                direccion.IdEvento = transaccion.IdGlobal;
+                direccion.Sucursal = transaccion.Sucursal;
+            }
+
+            await using (var contextoDeEscritura = new CrmContexto(sucursal))
+            {
+
+                try
+                {
+                    using (var transaccionDb = contextoDeEscritura.Database.BeginTransaction())
+                    {
+
+                        List<SqlRespuestaDomicilios> listaDeEscritoDomicilio = new List<SqlRespuestaDomicilios>();
+
+                        if (transaccion.DireccionesDeEntrega.Count > 0)
+                        {
+                            foreach (DireccionDeEntrega direccion in transaccion.DireccionesDeEntrega)
+                            {
+                                contextoDeEscritura.DireccionDeEntregas.Add(direccion);
+                            }
+
+                            var salidaCliente = contextoDeEscritura.SaveChanges();
+                            //transaccionDb.Commit(); PARA PRUEBAS
+                            //return null;
+
+                            if (salidaCliente == transaccion.DireccionesDeEntrega.Count()) //si falla guardar en la temp
+                                listaDeEscritoDomicilio = EscribirDomicilioSP(transaccion.IdGlobal, contextoDeEscritura).ToList();
+                            else
+                                throw new InvalidOperationException("Falló la Escritura de la Tabla Temporal");
+
+                        }
+                        else
+                        {
+                            var escritoDomicilio = new SqlRespuestaDomicilios();
+                            escritoDomicilio.Comprobante = "0";
+                            listaDeEscritoDomicilio.Add(escritoDomicilio);
+
+                        }
+
+                        if (string.IsNullOrEmpty(listaDeEscritoDomicilio.First().Comprobante))
+                        {
+                            transaccion.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: BUN");
+                            transaccion.EscrituraExitosa = false;
+                            transaccionDb.Rollback();
+                            transaccionDb.Dispose();
+
+                        }
+                        else
+                        {
+                            foreach (SqlRespuestaDomicilios domicilio in listaDeEscritoDomicilio)
+                            {
+                                if (domicilio.Resultado.Contains("Error"))
+                                {
+                                    transaccion.ListaDeErrores.Add($"Llamada: SP de Direcciones - ERROR SQL: {domicilio.Error_Mensaje}");
+                                }
+                                else
+                                {
+                                    transaccion.ListaDeDomicilios.Add(domicilio.Comprobante);
+                                }
+
+                            }
+                            //--escribio todo bien
+                            transaccionDb.Commit();
+                            transaccion.EscrituraExitosa = true;
+                        }
+                    }
+                }
+                catch (DbUpdateException ex)
+                {
+                    transaccion.EscrituraExitosa = false;
+                    transaccion.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: {ex.InnerException.Message}");
+                }
+                            
+            }
+            return transaccion;
+           
+        }
+
         public async Task<Transaccion> GuardarTransaccionAsyncV2(Transaccion transac, bool PasarAPedido)
         {
 
@@ -69,6 +155,7 @@ namespace SC_CRM_API.Repositorio
             transac.Cliente.IdEvento = transac.IdGlobal;
             transac.Presupuesto.Sucursal = transac.Sucursal;
             transac.Presupuesto.IdEvento = transac.IdGlobal;
+
             foreach (var direccion in transac.DireccionesDeEntrega)
             {
                 direccion.Sucursal = transac.Sucursal;
@@ -178,7 +265,7 @@ namespace SC_CRM_API.Repositorio
                                     transac.PresupuestoSave = true;
                                     transac.EscrituraExitosa = true;
 
-
+                                    //VERIFICAR VALIDACIONES CON EMA
                                     //verificar la escritura en tango
                                     if (PasarAPedido)
                                     {
@@ -573,5 +660,6 @@ namespace SC_CRM_API.Repositorio
             return ListadoDeErrores;
         }
 
+      
     }
 }

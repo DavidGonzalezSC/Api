@@ -145,7 +145,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string Observaciones { get; set; }
 
         [Column("ID_Calle")]								//[int] NULL,
-        public int IdCalle { get; set; }
+        public int? IdCalle { get; set; }
 
         [Column("AL_FIJ_IB3")]							//[int] NOT NULL,
         public int AlFijIb3 { get; set; }
@@ -189,7 +189,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
 
     //--PARA consultas
-    [Table("CRM_Sucursales")]
+    [Table("VW_CRM_Sucursales")]
     public class DireccionDeEntregaDeConsulta
     {
 
@@ -242,7 +242,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string Email { get; set; }
 
         [Column("ID_DIRECCION_ENTREGA")]					//[int] NULL,
-        public int IdDireccionEntrega { get; set; }
+        public int? IdDireccionEntrega { get; set; }
 
         [Column("Observaciones")]							//[varchar](8000) NOT NULL,
         public string Observaciones { get; set; }
@@ -285,6 +285,9 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         [Column("Longitud")]								//[float] NOT NULL,
         public double? Long { get; set; }
+
+        [Column("TienePedido")]
+        public int TienePedido { get; set; }           //agregado para las consultas de domicilios que tengan asociada esa direcicon a un pedido existente. NO VIVE EN LA TEMPORAL DE ESCRITURA
 
 
 

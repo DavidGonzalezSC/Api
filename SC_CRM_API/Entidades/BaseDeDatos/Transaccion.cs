@@ -38,4 +38,30 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public List<DireccionDeEntrega> DireccionesDeEntrega { get; set; } = new List<DireccionDeEntrega>();
         
     }
+
+    public class TransaccionEscrituraDomicilios
+    {
+        
+        
+
+        public TransaccionEscrituraDomicilios(string sucursal)
+        {
+            IdGlobal = Guid.NewGuid();
+            Sucursal = sucursal;
+            EscrituraExitosa = false;
+
+        }
+
+        public int IdCliente { get; set; } = 0;
+        public Guid IdGlobal { get; private set; }
+        public string Sucursal { get; set; }
+
+        public List<string> ListaDeErrores { get; set; } = new List<string>();
+        public List<string> ListaDeDomicilios { get; set; } = new List<string>();
+        public bool EscrituraExitosa { get; set; }
+        
+
+        public List<DireccionDeEntrega> DireccionesDeEntrega { get; set; } = new List<DireccionDeEntrega>();
+
+    }
 }
