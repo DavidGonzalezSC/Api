@@ -27,8 +27,8 @@ namespace SC_CRM_API.Controllers
             return Ok(retorno);
         }
 
-        [HttpPost("enviarMail")] //--LISTO
-        public async Task<IActionResult> enviarPorMail([FromBody] MailDto datos)
+        [HttpPost("generarPdf")] //--LISTO
+        public async Task<IActionResult> generarPdf([FromBody] MailDto datos)
         {
             var verificarSalida = await _mensajeria.confeccionarPdf(datos);
             return Ok(verificarSalida);
