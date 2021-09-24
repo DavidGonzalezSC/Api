@@ -13,7 +13,7 @@ namespace SC_CRM_API.Entidades.Dtos
         public Guid Identificador { get; set; } = Guid.NewGuid();
         public ClienteDeConsulta Cliente { get; set; } = new ClienteDeConsulta();
         public PresupuestoDeConsulta Presupuesto { get; set; } = new PresupuestoDeConsulta();
-        public List<DetalleDeConsulta> DetallesDto { get; set; } = new List<DetalleDeConsulta>();
+        public List<DetallesConVista> DetallesDto { get; set; } = new List<DetallesConVista>();
         public List<DireccionDeEntregaDeConsulta> DireccionesDeEntrega { get; set; } = new List<DireccionDeEntregaDeConsulta>();
     }
 }

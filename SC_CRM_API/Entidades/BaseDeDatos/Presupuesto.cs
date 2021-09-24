@@ -112,6 +112,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         }
     }
     
+
     public class Presupuesto : PresupuestoTemporal
 	{
 

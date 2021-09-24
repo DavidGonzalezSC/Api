@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SC_CRM_API.Contextos;
 using SC_CRM_API.Entidades.BaseDeDatos;
+using SC_CRM_API.Entidades.Dtos;
 using SC_CRM_API.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -148,6 +149,26 @@ namespace SC_CRM_API.Repositorio
            
         }
 
+        public async Task<bool> EliminarPedido(AnularpedidoDto anularDto)
+        {
+
+
+            if (!anularDto.Nro_Pedido.StartsWith(" "))
+                anularDto.Nro_Pedido = $" {anularDto.Nro_Pedido}";
+
+            string retorno = "";
+            Sucursal sucursal = await credencialesAsync(anularDto.Sucursal);
+            await using (var contextoDeEscritura = new CrmContexto(sucursal))
+            {
+                retorno = AnularPedidoSP(anularDto.Nro_Pedido, anularDto.Talonario,  contextoDeEscritura);
+
+            }
+            if (retorno.Contains("-1") || retorno.Contains("ERROR"))
+                return false;
+            else
+                return true;
+        }
+
         public async Task<Transaccion> GuardarTransaccionAsyncV2(Transaccion transac, bool PasarAPedido)
         {
 
@@ -172,7 +193,7 @@ namespace SC_CRM_API.Repositorio
 
                 try
                 {
-                    using (var transaccion = contextoDeEscritura.Database.BeginTransaction())
+                    await using (var transaccion = contextoDeEscritura.Database.BeginTransaction())
                     {
 
                         contextoDeEscritura.Clientes.Add(transac.Cliente);
@@ -199,6 +220,7 @@ namespace SC_CRM_API.Repositorio
                                 foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
                                 {
                                     direccion.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
+                                    direccion.Direccion = direccion.Calle.Trim() + " " + direccion.Numero.Trim() + " " + direccion.Piso.Trim() + " " + direccion.Depto.Trim();
                                     contextoDeEscritura.DireccionDeEntregas.Add(direccion);
                                 }
 
@@ -236,6 +258,11 @@ namespace SC_CRM_API.Repositorio
 
                                 foreach (Detalle detalle in transac.Detalles)
                                 {
+                                    if (string.IsNullOrEmpty(detalle.NumeroDellave))
+                                    {
+                                        long elapsedTicks = DateTime.Now.Ticks + 1;
+                                        detalle.NumeroDellave = elapsedTicks.ToString().Substring(8, 10);
+                                    }
 
                                     detalle.Sucursal = transac.Sucursal;
                                     detalle.IdEvento = transac.IdGlobal;
@@ -368,6 +395,12 @@ namespace SC_CRM_API.Repositorio
                         //-- Guardo Detalles
                         foreach (Detalle detalle in transac.Detalles)
                         {
+                            if (string.IsNullOrEmpty(detalle.NumeroDellave))
+                            {
+                                long elapsedTicks = DateTime.Now.Ticks + 1;
+                                detalle.NumeroDellave = elapsedTicks.ToString().Substring(8,10);
+                            }
+
                             detalle.Sucursal = transac.Sucursal;
                             detalle.IdEvento = transac.IdGlobal;
                             contextoDeEscritura.Detalles.Add(detalle);
@@ -403,7 +436,7 @@ namespace SC_CRM_API.Repositorio
         {
             var listaDeDatos = new List<SqlRespuesta>();
             SqlRespuesta spClienteTango;
-            SqlRespuesta spDireccionTango;
+            var spDireccionTango = new List<SqlRespuesta>();
             SqlRespuesta spPresupuestoTango;
 
             try
@@ -430,13 +463,13 @@ namespace SC_CRM_API.Repositorio
 
             try
             {
-                spDireccionTango = crmContexto.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_SC_DIRECCION_ENTREGA_Tango '{guid}';").AsEnumerable().FirstOrDefault();
-                listaDeDatos.Add(spDireccionTango);
+                spDireccionTango = crmContexto.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_SC_DIRECCION_ENTREGA_Tango '{guid}';").AsEnumerable().ToList();
+                listaDeDatos.AddRange(spDireccionTango);
 
             }
             catch (Exception error)
             {
-                spDireccionTango = new SqlRespuesta
+                var catchspDireccionTango = new SqlRespuesta
                 {
                     Resultado = "Error: Catch Tango Direccion",
                     Comprobante = "",
@@ -445,7 +478,8 @@ namespace SC_CRM_API.Repositorio
                     Error_Severidad = "0",
                     Error_Estado = "0"
                 };
-                listaDeDatos.Add(spDireccionTango);
+                spDireccionTango.Add(catchspDireccionTango);
+                listaDeDatos.AddRange(spDireccionTango);
             }
 
             try
@@ -472,6 +506,28 @@ namespace SC_CRM_API.Repositorio
 
         }
 
+        
+        private string AnularPedidoSP(string Pedido, Int16 Talonario, CrmContexto crmContexto)
+        {
+            var respuesta = new SqlRespuestaPlana();
+
+            try
+            {
+
+                respuesta = crmContexto.Set<SqlRespuestaPlana>().FromSqlRaw($"EXECUTE dbo.SP_SC_AnularPedido '{Talonario}', '{Pedido}';").AsEnumerable().FirstOrDefault();
+
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine(error);
+                respuesta.Resultado = "-1";
+
+            }
+
+            return respuesta.Resultado;
+
+        }
+        
         private SqlRespuesta EscribirClienteSP(Guid guid, CrmContexto crmContexto)
         {
             var spEscribeCliente = new SqlRespuesta();
@@ -559,6 +615,12 @@ namespace SC_CRM_API.Repositorio
             return ListadoDeDomicilios;
 
         }
+
+
+
+
+
+
 
 
         public async Task<IEnumerable<string>> validarCabecera(Presupuesto presupuesto)

@@ -26,4 +26,9 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string NombreDomicilio { get; set; }
     }
 
+    public class SqlRespuestaPlana
+    {
+        public string Resultado { get; set; }
+    }
+
 }

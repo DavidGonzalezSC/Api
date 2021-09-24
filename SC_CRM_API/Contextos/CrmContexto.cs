@@ -36,8 +36,12 @@ namespace SC_CRM_API.Contextos
         {
             modelBuilder.Entity<SqlRespuesta>().HasNoKey();
             modelBuilder.Entity<SqlRespuestaDomicilios>().HasNoKey();
+            modelBuilder.Entity<SqlRespuestaPlana>().HasNoKey();
             modelBuilder.Entity<PedidoDeConsulta>().HasNoKey();
-            
+            modelBuilder.Entity<DetallesConVista>().HasNoKey();
+            modelBuilder.Entity<PresupuestoPasadosAPedido>().HasNoKey();
+            modelBuilder.Entity<PedidoDetalle>().HasNoKey();
+
         }
 
         //--Escritura
@@ -47,12 +51,17 @@ namespace SC_CRM_API.Contextos
         public DbSet<DireccionDeEntrega> DireccionDeEntregas { get; set; }
         public DbSet<SqlRespuesta> RespuestaEscritura { get; set; }
         public DbSet<SqlRespuestaDomicilios> RespuestaEscrituraDeDomicilios { get; set; }
+        public DbSet<SqlRespuestaPlana> RespuestaString { get; set; }
 
         //--Lectura
         public DbSet<ClienteDeConsulta> ClientesDeConsulta { get; set; }
-        public DbSet<DetalleDeConsulta> DetallesParaConsulta { get; set; }
         public DbSet<PresupuestoDeConsulta> PresupuestosParaConsulta { get; set; }
+        public DbSet<DetallesEnTabla> DetallesParaConsulta { get; set; }
+        public DbSet<DetallesConVista> DetallesParaConsultaVista { get; set; }
         public DbSet<DireccionDeEntregaDeConsulta> DireccionDeEntregaParaConsulta { get; set; }
         public DbSet <PedidoDeConsulta> PedidosParaConsulta { get; set; }
+        public DbSet<PresupuestoPasadosAPedido> PresupuestosAPedidos { get; set; }
+        public DbSet<PedidoDetalle> DetallesPedidos { get; set; }
+
     }
 }

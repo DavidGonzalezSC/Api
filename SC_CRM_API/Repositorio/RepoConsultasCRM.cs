@@ -127,13 +127,24 @@ namespace SC_CRM_API.Repositorio
             }
         }
 
-        public async Task<List<DetalleDeConsulta>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto)
+        public async Task<List<DetallesEnTabla>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto)
         {
             Sucursal credenciales = await credencialesAsync(sucursal);
 
             await using (var _crmDbContext = new CrmContexto(credenciales))
             {
                 return _crmDbContext.DetallesParaConsulta.Where(c => c.IdPresupuesto == Convert.ToInt32(idPresupuesto.Trim())).ToList();
+
+            }
+        }
+
+        public async Task<List<DetallesConVista>> buscarDetallesPorPresupuestoVista(string sucursal, string idPresupuesto)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                return _crmDbContext.DetallesParaConsultaVista.Where(c => c.IdPresupuesto == Convert.ToInt32(idPresupuesto.Trim())).ToList();
 
             }
         }
@@ -148,7 +159,7 @@ namespace SC_CRM_API.Repositorio
             {
                 presupuesto.Presupuesto = _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == Convert.ToInt32(IdPresupuesto)).FirstOrDefault();
                 presupuesto.Cliente = _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuesto.Presupuesto.IdCliente).FirstOrDefault();
-                presupuesto.DetallesDto = _crmDbContext.DetallesParaConsulta.Where(d => d.IdPresupuestoDetalle == presupuesto.Presupuesto.IdPresupuesto).ToList();
+                presupuesto.DetallesDto = _crmDbContext.DetallesParaConsultaVista.Where(d => d.IdPresupuesto == presupuesto.Presupuesto.IdPresupuesto).ToList();
                 presupuesto.DireccionesDeEntrega = _crmDbContext.DireccionDeEntregaParaConsulta.Where(e => e.IdCliente == presupuesto.Cliente.IdCliente).ToList();
 
             }
@@ -230,6 +241,32 @@ namespace SC_CRM_API.Repositorio
             return pedido;
 
 
+        }
+
+        public async Task<IEnumerable<PresupuestoPasadosAPedido>> listadoPresupuestoPasadosAPedido(string sucursal, string nroPedido)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+            var IdPedido = Convert.ToInt32(nroPedido);
+            List<PresupuestoPasadosAPedido> listado = new List<PresupuestoPasadosAPedido>();
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+                listado = _crmDbContext.PresupuestosAPedidos.Where(ip => ip.Id_Presupuesto == IdPedido).ToList();
+
+            return listado;
+
+        }
+
+        public async Task<PedidoDetalle> buscarPedidoConDetalle(string sucursal, short Talonario, string NroDePedido)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+            var pedido = new PedidoDetalle();
+            if(!NroDePedido.StartsWith(" "))
+                NroDePedido = " " + NroDePedido;
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+                pedido = _crmDbContext.DetallesPedidos.Where(ip => ip.NRO_PEDIDO == NroDePedido && ip.Talon_ped == Talonario).FirstOrDefault();
+
+            return pedido;
         }
     }
 }

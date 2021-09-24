@@ -50,5 +50,16 @@ namespace SC_CRM_API.Controllers
                 return NotFound();
         }
 
+        [HttpPost("{sucursal}/seguimientos/guardarTratativa")]
+        public async Task<IActionResult> guardarDatosTratativas([FromRoute] string sucursal, [FromBody] SeguimientosPresupuestoTratativa tratativa)
+        {
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var guardarDatos = await _presupuestos.GuardarParametrosTratativa(sucursal, tratativa);
+            return Ok(guardarDatos);
+        }
+
     }
 }

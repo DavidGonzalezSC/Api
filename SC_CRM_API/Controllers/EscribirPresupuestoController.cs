@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SC_CRM_API.Entidades.BaseDeDatos;
 using SC_CRM_API.Entidades.Dtos;
 using SC_CRM_API.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -77,6 +80,15 @@ namespace SC_CRM_API.Controllers
         public async Task<IActionResult> escribirPedido([FromRoute] string cadena, [FromBody] TransaccionDto transaccDto)
         {
 
+            IEnumerable<ModelError> errores;
+
+            if (!ModelState.IsValid)
+            {
+                errores = ModelState.Keys.SelectMany(key => ModelState[key].Errors);
+                return BadRequest(errores);
+
+            }
+
             var transaccion = new Transaccion(cadena);
             transaccion.Cliente = transaccDto.Cliente;
             transaccion.Presupuesto = transaccDto.Presupuesto;
@@ -92,7 +104,7 @@ namespace SC_CRM_API.Controllers
             }
 
             //var escribio = await _escritura.EscribirSoloEnTemporalParaPruebas(transaccion);
-            var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion, false);
+            var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion, true);
 
             //--Verificar que pasó
             if (!escribio.EscrituraExitosa)
@@ -177,7 +189,13 @@ namespace SC_CRM_API.Controllers
             }
             else
             {
-                return Ok(escribio.ListaDeDomicilios);
+                var convertidosANumero = new List<int>();
+                foreach (var item in escribio.ListaDeDomicilios)
+                {
+                    int numero = Convert.ToInt32(item);
+                    convertidosANumero.Add(numero);
+                }
+                return Ok(convertidosANumero);
             }
 
         }

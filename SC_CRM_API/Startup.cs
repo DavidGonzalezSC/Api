@@ -54,6 +54,7 @@ namespace SC_CRM_API
 
             app.UseAuthorization();
 
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {

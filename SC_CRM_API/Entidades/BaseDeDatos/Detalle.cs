@@ -33,6 +33,8 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         public int Creacion { get; set; }
 
+        public bool PasarAPedido { get; set; }
+
     }
 
     public class ValidarDetalle : AbstractValidator<Detalle>
@@ -233,12 +235,27 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
     }
 
-    //--Directo para consultas
+    [Table("VW_CRM_PRESUPUESTOSDETALLES")]
+    public class DetallesConVista : DetalleDeConsulta
+    {
+        [Column("ID_PresupuestoDetalle")]
+        public int IdPresupuestoDetalle { get; set; }
+
+        public string Editable { get; set; }
+    }
+
     [Table("CRM_PresupuestosDetalles")]
+    public class DetallesEnTabla : DetalleDeConsulta
+    {
+        [Column("ID_PresupuestoDetalle")]
+        [Key]                 //[int] IDENTITY(1,1) NOT NULL,
+        public int IdPresupuestoDetalle { get; set; }
+    }
+
+    //--Directo para consultas
+    
     public class DetalleDeConsulta
     {
-        [Column("ID_PresupuestoDetalle")][Key]                 //[int] IDENTITY(1,1) NOT NULL,
-        public int IdPresupuestoDetalle { get; set; }
 
         [Column("ID_Presupuesto")]                      // [int] NOT NULL,
         public int IdPresupuesto { get; set; }

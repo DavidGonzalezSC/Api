@@ -30,7 +30,26 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-      
+        public async Task<bool> GuardarParametrosTratativa(string sucursal, SeguimientosPresupuestoTratativa tratativa)
+        {
+            int escribio = 0;
+
+            Sucursal contexto = await credencialesAsync(sucursal);
+            await using (var _crmDbContext = new CrmContexto(contexto))
+            {
+                var presupuesto = _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == tratativa.Idpresupuesto).FirstOrDefault();
+                presupuesto.Comentarios = tratativa.Comentarios;
+                presupuesto.ProximoContacto = tratativa.Prox_Contacto;
+                escribio =  _crmDbContext.SaveChanges();
+            }
+
+            if (escribio > 0)
+                return true;
+            else
+                return false;
+
+        }
+
         public async Task<IEnumerable<TransaccionGuardada>> ListadoDePresupuestosAsync(string sucursal, int vendedor, int dias, string estados)
         {
             Sucursal contexto = await credencialesAsync(sucursal);
@@ -83,5 +102,7 @@ namespace SC_CRM_API.Repositorio
             }
             
         }
+
+
     }
 }

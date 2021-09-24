@@ -117,7 +117,8 @@ namespace SC_CRM_API.Controllers
         [HttpGet("{sucursal}/renglonesDelpresupuesto/{IdPresupuesto}")] //--
         public async Task<IActionResult> renglonesDelPresupuesto([FromRoute] string sucursal, [FromRoute] string IdPresupuesto)
         {
-            var renglones = await _consultas.buscarDetallesPorPresupuesto(sucursal, IdPresupuesto);
+            var renglones = await _consultas.buscarDetallesPorPresupuestoVista(sucursal, IdPresupuesto);
+            //var renglones = await _consultas.buscarDetallesPorPresupuesto(sucursal, IdPresupuesto);
             if (renglones.Count() > 0)
                 return Ok(renglones);
             else
@@ -137,6 +138,7 @@ namespace SC_CRM_API.Controllers
         }
 
         //--PEDIDOS
+        /* Desactivada
         [HttpGet("{sucursal}/pedidos/{Talonario}/{NroPedido}")]
         public async Task<IActionResult> obtenerPedido([FromRoute] string sucursal, [FromRoute] Int16 Talonario, [FromRoute] string NroPedido)
         {
@@ -146,7 +148,24 @@ namespace SC_CRM_API.Controllers
                 return NotFound();
             else
                 return Ok(pedido);
+        }*/
+
+        [HttpGet("{sucursal}/obtenercabecerapedidos/{Talonario}/{NroPedido}")]
+        public async Task<IActionResult> obtenerDetallesDePedido([FromRoute] string sucursal, [FromRoute] Int16 Talonario, [FromRoute] string NroPedido)
+        {
+
+            var pedido = await _consultas.buscarPedidoConDetalle(sucursal, Talonario, NroPedido);
+            return Ok(pedido);
         }
+
+        [HttpGet("{sucursal}/listarPdos/{PresuId}")]
+        public async Task<IActionResult> listarPedidosDelPresu([FromRoute] string sucursal, [FromRoute] string PresuId)
+        {
+            var listado = await _consultas.listadoPresupuestoPasadosAPedido(sucursal, PresuId);
+            return Ok(listado);
+        }
+
+
 
         //--Presupuestos va en otro controlador por separado
 

@@ -12,5 +12,6 @@ namespace SC_CRM_API.Interfaces
         //-- Listados dwe Presupuestos
         Task<IEnumerable<TransaccionGuardada>> ListadoDePresupuestosAsync(string sucursal, int vendedor, int dias, string estados);
         Task<ClienteDeConsulta> ObtenerClienteParaSeguimiento(string sucursal, int idCliente);
+        Task<bool> GuardarParametrosTratativa(string sucursal, SeguimientosPresupuestoTratativa tratativa);
     }
 }

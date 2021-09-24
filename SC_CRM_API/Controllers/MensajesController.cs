@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace SC_CRM_API.Controllers
 {
@@ -28,13 +30,29 @@ namespace SC_CRM_API.Controllers
         [HttpPost("enviarMail")] //--LISTO
         public async Task<IActionResult> enviarPorMail([FromBody] MailDto datos)
         {
-            var verificarSalida = await _mensajeria.confeccionarMail(datos);
-            if (verificarSalida)
-                return Ok("Enviado");
-            else
-                return Ok("Bun");
+            var verificarSalida = await _mensajeria.confeccionarPdf(datos);
+            return Ok(verificarSalida);
 
         }
+
+        [HttpGet("descargar/{guid}")]
+        public IActionResult DescargarPdf([FromRoute] string guid)
+        {
+            string archivo = AppDomain.CurrentDomain.BaseDirectory + $"\\Comandos\\Pdfs\\{guid}.pdf";
+            if(System.IO.File.Exists(archivo))
+            {
+                Response.Headers.Add("Content-Disposition", "inline; filename=Presupuesto.pdf");
+                return PhysicalFile(archivo, "application/pdf");
+
+            }
+            else
+            {
+                return NotFound();
+            }
+
+
+        }
+
 
 
     }

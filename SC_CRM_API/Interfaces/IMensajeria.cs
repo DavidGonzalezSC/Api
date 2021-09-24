@@ -9,7 +9,7 @@ namespace SC_CRM_API.Interfaces
 {
     public interface IMensajeria
     {
-        Task<bool> confeccionarMail(MailDto parametros);
+        Task<string> confeccionarPdf(MailDto parametros);
         Task<bool> guardarParaEnvio(Email mensaje);
         IEnumerable<string> ListarPlantillas();
     }

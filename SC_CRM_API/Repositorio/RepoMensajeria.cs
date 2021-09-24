@@ -39,13 +39,13 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-        public async Task<bool> confeccionarMail(MailDto parametros)
+        public async Task<string> confeccionarPdf(MailDto parametros)
         {
 
 
             Sucursal contexto = await credencialesAsync(parametros.Sucursal);
             if (contexto == null)
-                return false;
+                return "";
 
             PresupuestoDevueltoDbDto presupuestoAImprimir = new PresupuestoDevueltoDbDto();
             presupuestoAImprimir.NumeroPedido = parametros.Presupuesto;
@@ -55,26 +55,26 @@ namespace SC_CRM_API.Repositorio
             await using (var _crmDbContext = new CrmContexto(contexto))
             {
                 presupuestoAImprimir.Presupuesto = await _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == parametros.Presupuesto).FirstOrDefaultAsync();
-                presupuestoAImprimir.DetallesDto = await _crmDbContext.DetallesParaConsulta.Where(i => i.IdPresupuesto == parametros.Presupuesto).ToListAsync();
+                presupuestoAImprimir.DetallesDto = await _crmDbContext.DetallesParaConsultaVista.Where(i => i.IdPresupuesto == parametros.Presupuesto).ToListAsync();
                 presupuestoAImprimir.Cliente = await _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuestoAImprimir.Presupuesto.IdCliente).FirstOrDefaultAsync();
             }
 
             if (presupuestoAImprimir.Presupuesto == null || presupuestoAImprimir.DetallesDto.Count < 1)
-                return false;
+                return "";
 
 
             //escribir el archivo json con la data
-            string nombreArchivo = presupuestoAImprimir.Sucursal + "_" + presupuestoAImprimir.Identificador + ".txt";
-            string pati_json = AppDomain.CurrentDomain.BaseDirectory + $"\\Json\\{nombreArchivo}";
+            string nombreArchivo = presupuestoAImprimir.Sucursal + "_" + presupuestoAImprimir.Identificador + ".json";
+            string pati_json = AppDomain.CurrentDomain.BaseDirectory + $"\\Comandos\\Json\\{nombreArchivo}";
             using FileStream crearStream = File.Create(pati_json);
             await JsonSerializer.SerializeAsync(crearStream, presupuestoAImprimir);
+            crearStream.Close();
 
             EjecutarCreacionPDF(nombreArchivo);
 
-
-
             //if (enviado)
-            return true;
+            string resultado = Path.GetFileNameWithoutExtension(nombreArchivo);
+            return resultado;
             //else
               ///  return false;
         }
@@ -170,7 +170,10 @@ namespace SC_CRM_API.Repositorio
             ProcessStartInfo processInfo;
             Process proceso;
 
-            processInfo = new ProcessStartInfo("cmd.exe", "/c " + parametro);
+            //processInfo = new ProcessStartInfo("cmd.exe", "/c " + parametro);
+            //string cadenaEjecutoria = AppDomain.CurrentDomain.BaseDirectory + $"\\Comandos\\GenerarPdf.exe {parametro}";
+            string cadenaEjecutoria = AppDomain.CurrentDomain.BaseDirectory + $"\\Comandos\\GenerarPdf.exe";
+            processInfo = new ProcessStartInfo(cadenaEjecutoria, parametro);
             processInfo.CreateNoWindow = true;
             processInfo.UseShellExecute = false;
 
@@ -195,7 +198,7 @@ namespace SC_CRM_API.Repositorio
         }
 
         //--prueba delista blanca + salida directa
-        public void envioDirecto(Email mensaje)
+        public void envioDirecto(Email mensaje, string archivo)
         {
             using (SmtpClient SmtpServer = new SmtpClient("smtp-relay.gmail.com"))
             { 
@@ -213,7 +216,8 @@ namespace SC_CRM_API.Repositorio
                     mail.IsBodyHtml = true;
 
                     Attachment adjunto;
-                    string ruta = AppDomain.CurrentDomain.BaseDirectory + "\\Plantillas\\presupuesto.pdf";
+                    //string ruta = AppDomain.CurrentDomain.BaseDirectory + "\\Plantillas\\presupuesto.pdf";
+                    string ruta = AppDomain.CurrentDomain.BaseDirectory + $"\\Comandos\\Pdfs\\{archivo}.pdf";
 
                     if (ruta != null)
                     {

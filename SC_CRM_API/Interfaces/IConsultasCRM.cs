@@ -23,7 +23,8 @@ namespace SC_CRM_API.Interfaces
         //--PRESUPUESTO
         Task<List<PresupuestoDeConsulta>> buscarPresupuestosPorCliente(string sucursal, string idCliente);
         Task<List<DireccionDeEntregaDeConsulta>> buscarDomiciliosPorCliente(string sucursal, string idCliente);
-        Task<List<DetalleDeConsulta>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto);
+        Task<List<DetallesEnTabla>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto);
+        Task<List<DetallesConVista>> buscarDetallesPorPresupuestoVista(string sucursal, string idPresupuesto);
         Task<PresupuestoDevueltoDbDto> obtenerPresupuesto(string sucursal, string IdPresupuesto);
         //-- Todo: PRESUPUESTO POR NUMERO
 
@@ -31,6 +32,8 @@ namespace SC_CRM_API.Interfaces
 
         //--PEDIDO
         Task<PedidoDeConsultaDto> buscarPedido(string sucursal, Int16 Talonario, string NroDePedido);
+        Task<PedidoDetalle> buscarPedidoConDetalle(string sucursal, Int16 Talonario, string NroDePedido);
+        Task<IEnumerable<PresupuestoPasadosAPedido>> listadoPresupuestoPasadosAPedido(string sucursal, string nroPedido);
        // pedidos por presu
          //   pedidos por cliente
 
