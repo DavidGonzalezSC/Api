@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SC_CRM_API.Contextos;
+using SC_CRM_API.Helpers.Validaciones;
 using SC_CRM_API.Interfaces;
 using SC_CRM_API.Repositorio;
 using System;
@@ -33,6 +34,7 @@ namespace SC_CRM_API
             services.AddDbContext<SucursalesDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("Productivo")));
             services.AddDbContext<MensajeriaDbContext>();
 
+            services.AddScoped<IValidaciones, ReglasDeValidacion>();
             services.AddScoped<IServiciosSucursales, ServicioSucursales>();
             services.AddScoped<IEscrituraCRM, RepoEscrituraCRM>();
             services.AddScoped<IConsultasCRM, RepoConsultasCRM>();

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SC_CRM_API.Contextos
 {
-    class CrmContexto : DbContext
+    public class CrmContexto : DbContext
     {
 
         public string Servidor { get; private set; }

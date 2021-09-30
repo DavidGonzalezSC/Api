@@ -1,4 +1,6 @@
 ﻿using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using SC_CRM_API.Contextos;
 using SC_CRM_API.Entidades.BaseDeDatos;
 using SC_CRM_API.Entidades.Dtos;
 using System.Collections.Generic;
@@ -18,7 +20,16 @@ namespace SC_CRM_API.Interfaces
         public Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direccion);
         public Task<IEnumerable<string>> validarTransaccion(Transaccion transaccion);
 
+
+
+
         //--Pedidos
+
+        //Validar Pedido
+        public Task<ValidacionesPedido> validarPedido(Transaccion transac, CrmContexto contexto);
+
+
+
         //Anular
         public Task<bool> EliminarPedido(AnularpedidoDto anularDto);
     }

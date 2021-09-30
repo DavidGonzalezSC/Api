@@ -33,7 +33,8 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         public int Creacion { get; set; }
 
-        public bool PasarAPedido { get; set; }
+        [Column("PasarAPedido")]
+        public bool RenglonAPedido { get; set; }
 
     }
 
@@ -232,6 +233,9 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         [NotMapped]
         public string NombreDomicilio { get; set; } //utilizado para pasar la definicion desde el renglon de domicilio y matchear cuando se escriben con el Id retiornado por el SP de sucursales
+        
+        [NotMapped]
+        public IEnumerable<string> CodigosValidados = new List<string>(); //utilizado para alojar los SP que se quieran puentear
 
     }
 

@@ -92,6 +92,7 @@ namespace SC_CRM_API.Controllers
             var transaccion = new Transaccion(cadena);
             transaccion.Cliente = transaccDto.Cliente;
             transaccion.Presupuesto = transaccDto.Presupuesto;
+            transaccion.Presupuesto.IdMotivoEstado = null;
 
             foreach (DetalleDto item in transaccDto.DetallesDto)
             {
@@ -104,7 +105,7 @@ namespace SC_CRM_API.Controllers
             }
 
             //var escribio = await _escritura.EscribirSoloEnTemporalParaPruebas(transaccion);
-            var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion, true);
+            var escribio = await _escritura.GuardarTransaccionAsyncV2(transaccion, transaccDto.PasarAPedido);
 
             //--Verificar que pasó
             if (!escribio.EscrituraExitosa)
@@ -119,6 +120,7 @@ namespace SC_CRM_API.Controllers
 
                 if (escribio.ListaDeErrores.Any())
                 {
+                    escribio.ListaDeErrores.Insert(0, "ERROR");
                     return Ok(escribio.ListaDeErrores);
 
                 }else
@@ -133,11 +135,11 @@ namespace SC_CRM_API.Controllers
                         mensaje = "Tango con Errores";
                 }
 
-
                 return Ok(mensaje);
 
             }else
             {
+                escribio.ListaDePedidos.Insert(0, "OK");
                 return Ok(escribio.ListaDePedidos);
             }
 

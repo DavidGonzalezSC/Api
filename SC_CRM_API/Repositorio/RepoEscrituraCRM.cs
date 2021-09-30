@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SC_CRM_API.Contextos;
 using SC_CRM_API.Entidades.BaseDeDatos;
 using SC_CRM_API.Entidades.Dtos;
+using SC_CRM_API.Helpers.Validaciones;
 using SC_CRM_API.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,12 @@ namespace SC_CRM_API.Repositorio
     {
 
         private readonly IServiciosSucursales _sucursales;
+        private readonly IValidaciones _validaciones;
 
-        public RepoEscrituraCRM(IServiciosSucursales sucursales)
+        public RepoEscrituraCRM(IServiciosSucursales sucursales, IValidaciones validaciones)
         {
             _sucursales = sucursales ?? throw new ArgumentNullException(nameof(IServiciosSucursales));
+            _validaciones = validaciones ?? throw new ArgumentNullException(nameof(IValidaciones));
         }
 
         public void EscribirLogs(string sucursal, string mensaje)
@@ -172,6 +175,9 @@ namespace SC_CRM_API.Repositorio
         public async Task<Transaccion> GuardarTransaccionAsyncV2(Transaccion transac, bool PasarAPedido)
         {
 
+            Sucursal sucursal = await credencialesAsync(transac.Sucursal);
+            //--Validaciones pasadas
+
             transac.Cliente.Sucursal = transac.Sucursal;
             transac.Cliente.IdEvento = transac.IdGlobal;
             transac.Presupuesto.Sucursal = transac.Sucursal;
@@ -183,14 +189,12 @@ namespace SC_CRM_API.Repositorio
                 direccion.IdEvento = transac.IdGlobal;
 
             }
-
-            Sucursal sucursal = await credencialesAsync(transac.Sucursal);
+            
             string metodo = System.Reflection.MethodBase.GetCurrentMethod().Name;
             int salidaCliente = 0;
 
             await using (var contextoDeEscritura = new CrmContexto(sucursal))
             {
-
                 try
                 {
                     await using (var transaccion = contextoDeEscritura.Database.BeginTransaction())
@@ -211,6 +215,7 @@ namespace SC_CRM_API.Repositorio
                         else
                         {
                             transac.ClienteSave = true;
+                            transac.ListaDePedidos.Add(escritoCliente.Comprobante);
                             //cliente escribio bien..pasamos a domicilio
                             //--domicilio
                             List<SqlRespuestaDomicilios> listaDeEscritoDomicilio = new List<SqlRespuestaDomicilios>();
@@ -248,6 +253,10 @@ namespace SC_CRM_API.Repositorio
 
 
                                 //domicilio escribio bien pasamos al presupuesto
+                                foreach (var item in listaDeEscritoDomicilio)
+                                {
+                                    transac.ListaDePedidos.Add(item.Comprobante);
+                                }
                                 transac.DomicEntregaSave = true;
 
                                 transac.Presupuesto.IdDeSucursal = Convert.ToInt32(0); //paso el dato del cliente
@@ -288,14 +297,30 @@ namespace SC_CRM_API.Repositorio
                                 }
                                 else
                                 {
-
+                                    transac.ListaDePedidos.Add(escritoPresupuesto.Comprobante);
                                     transac.PresupuestoSave = true;
                                     transac.EscrituraExitosa = true;
 
-                                    //VERIFICAR VALIDACIONES CON EMA
-                                    //verificar la escritura en tango
+                                    
                                     if (PasarAPedido)
                                     {
+
+                                        //================ VALIDACIONES===============================
+                                        
+                                        var validaciones = new ValidacionesPedido();
+                                        validaciones = await validarPedido(transac, contextoDeEscritura);
+
+                                        if (!validaciones.PedidoValido) //el pedido no pasó las validaciones
+                                        {
+                                            transac.EscrituraExitosa = false;
+                                            transac.ListaDeErrores.AddRange(validaciones.ListaDeErrores);
+                                            transaccion.Rollback();
+                                            transaccion.Dispose();
+                                            return transac;
+                                        }
+
+                                        //================ VALIDACIONES===============================
+
                                         var listadoDeTango = EscribirEnTango(transac.IdGlobal, contextoDeEscritura);
                                         transac.TangoSave = true;
 
@@ -349,7 +374,6 @@ namespace SC_CRM_API.Repositorio
 
             }
         }
-
 
         public async Task<Transaccion> EscribirSoloEnTemporalParaPruebas(Transaccion transac)
         {
@@ -617,11 +641,123 @@ namespace SC_CRM_API.Repositorio
         }
 
 
+        //-- Validaciones
+        public async Task<ValidacionesPedido> validarPedido(Transaccion transac, CrmContexto contexto)
+        {
+            var reglasEnUso = await _validaciones.ConjuntoDereglas(transac.Sucursal);
+            var validacionesRealizadas = new ValidacionesPedido();
+            int cuentaRenglones = 0;
+
+            //--Validaciones de SP antes que los renglones porque es a nivel PEDIDO
+            var respuesta = new SqlRespuestaPlana();
+
+            try
+            {
+                foreach (var item in reglasEnUso.ListaSpConsulta)
+                {
+                    respuesta = contexto.Set<SqlRespuestaPlana>().FromSqlRaw(
+                        $"EXECUTE dbo.{item.Nombre} '{transac.Presupuesto.IdPresupuesto}', '{transac.IdGlobal}';").AsEnumerable().FirstOrDefault();
+
+                    if (!respuesta.Resultado.Contains("OK"))
+                    {
+                        validacionesRealizadas.ListaDeErrores.Add(respuesta.Resultado);
+                        validacionesRealizadas.PedidoValido = false;
+                    }
+
+                }
+
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine(error);
+                respuesta.Resultado = "-1";
+
+            }
+
+
+            //--validar renglones
+            foreach (Detalle item in transac.Detalles)
+            {
+                cuentaRenglones++;
+                
+                //-- Validar Depo y Transporte
+                var validarDepoTransp = reglasEnUso.ListaDeDepoTransporte.Where(d => d.deposito == item.Campo_1 && d.transporte == item.Campo_3).Any();
+                if (!validarDepoTransp)
+                {
+                    string mensaje = $"Renglon {cuentaRenglones}: La combinación de depósito({item.Campo_1}) y transporte ({item.Campo_3})no es válida.";
+                    validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                    validacionesRealizadas.PedidoValido = false;
+                }
+
+
+                //Inactivo Lmk
+                var validarInactivo = reglasEnUso.ListaDeInactivos.Where(d => d.CodArticu == item.CodigoArticulo && d.Deposito == item.Campo_1).Any();
+                if (validarInactivo)
+                {
+                    string mensaje = $"Renglon {cuentaRenglones}: El artículo ({item.CodigoArticulo}) se encuentra Inactivo para el deposito {item.Campo_1}";
+                    validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                    validacionesRealizadas.PedidoValido = false;
+                }
+
+
+                //--Articulo Proveedor
+                var validarDepo = reglasEnUso.ListaFabricantes.Where(f => f.Deposito == item.Campo_1).Any();
+                if (validarDepo)
+                {
+                    var validarArtiProvee = reglasEnUso.ListaDeArticulosPorProveedor.Where(d => d.CodigoArticulo == item.CodigoArticulo && d.Deposito == item.Campo_1).Any();
+                    if (!validarArtiProvee)
+                    {
+                        string mensaje = $"Renglon {cuentaRenglones}: El artículo ({item.CodigoArticulo}) no puede asignarse al depósito {item.Campo_1}";
+                        validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                        validacionesRealizadas.PedidoValido = false;
+                    }
+                }
+
+
+                //Excepciones comerciales
+                var validarExcepcion = reglasEnUso.ListaDeExcepcionesComerciales.Where(d => d.Clasificacion == item.CodigoDescuento).Any();
+                if (!validarExcepcion)
+                {
+                    //--La clasificacion existe
+                    if(item.Bonif_2 > 0)
+                    {
+                        string mensaje = $"Renglon {cuentaRenglones}: Debe Clasificar el Renglón como Excepción comercial";
+                        validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                        validacionesRealizadas.PedidoValido = false;
+                    }
+
+                }else
+                {
+                    if (item.Bonif_2 == 0)
+                    {
+                        string mensaje = $"Renglon {cuentaRenglones}: Debe Aplicar un Descuento Fuera de Pauta.";
+                        validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                        validacionesRealizadas.PedidoValido = false;
+                    }
+                }
+
+
+
+            }
+
+            //--ValidarcontraSP
 
 
 
 
 
+
+
+
+            return validacionesRealizadas;
+
+        }
+
+
+
+
+
+        //--------------- No utilizadas -------------------------------
 
         public async Task<IEnumerable<string>> validarCabecera(Presupuesto presupuesto)
         {
@@ -658,26 +794,7 @@ namespace SC_CRM_API.Repositorio
 
             return errores;
         }
-
-        public async Task<IEnumerable<string>> validarDetalle(Detalle detalle)
-        {
-
-            ValidarDetalle validardetalle = new ValidarDetalle();
-            ValidationResult resultado = await validardetalle.ValidateAsync(detalle);
-            List<string> errores = new List<string>();
-
-            if (!resultado.IsValid)
-            {
-                foreach (var error in resultado.Errors)
-                {
-                    string mensaje = "Falló la validación del Renglón en: " + error.PropertyName + " - Error: " + error.ErrorMessage;
-                    errores.Add(mensaje);
-                }
-            }
-
-            return errores;
-        }
-
+        
         public async Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direcciones)
         {
             ValidarDireccionDeEntrega validarDireccion = new ValidarDireccionDeEntrega();
@@ -708,8 +825,8 @@ namespace SC_CRM_API.Repositorio
 
             foreach (Detalle item in transaccion.Detalles)
             {
-                var erroresDetalle = await validarDetalle(item);
-                ListadoDeErrores.AddRange(erroresDetalle);
+                var erroresDetalle = validarDetalle(item);
+                ListadoDeErrores.AddRange(erroresDetalle.Result);
             }
 
             foreach (DireccionDeEntrega item in transaccion.DireccionesDeEntrega)
@@ -722,6 +839,10 @@ namespace SC_CRM_API.Repositorio
             return ListadoDeErrores;
         }
 
-      
+        public Task<IEnumerable<string>> validarDetalle(Detalle detalle)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
