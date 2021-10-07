@@ -32,6 +32,7 @@ namespace SC_CRM_API
             //agregar cors
             services.AddCors();
             services.AddDbContext<SucursalesDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("Productivo")));
+            services.AddDbContext<MensajeriaDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("ServidorMail")));
             services.AddDbContext<MensajeriaDbContext>();
 
             services.AddScoped<IValidaciones, ReglasDeValidacion>();

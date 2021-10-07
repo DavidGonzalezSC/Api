@@ -10,5 +10,6 @@ namespace SC_CRM_API.Entidades.Dtos
         public string Sucursal { get; set; }
         public int Presupuesto { get; set; }
         public string Plantilla { get; set; }
+        public string Observaciones { get; set; }
     }
 }

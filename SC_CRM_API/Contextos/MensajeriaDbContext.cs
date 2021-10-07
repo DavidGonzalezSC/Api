@@ -12,12 +12,9 @@ namespace SC_CRM_API.Contextos
     {
         public DbSet<Email> MailsAEnviar { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public MensajeriaDbContext(DbContextOptions<MensajeriaDbContext> opciones)
+           : base(opciones)
         {
-            optionsBuilder
-                .UseSqlServer(
-                    @"Server=192.168.0.5;Initial Catalog=ServicioMails;User Id=Sa;Password=SC2020$;",
-                    options => options.EnableRetryOnFailure());
         }
 
     }

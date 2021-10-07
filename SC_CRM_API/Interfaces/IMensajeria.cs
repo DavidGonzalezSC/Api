@@ -12,5 +12,6 @@ namespace SC_CRM_API.Interfaces
         Task<string> confeccionarPdf(MailDto parametros);
         Task<bool> guardarParaEnvio(Email mensaje);
         IEnumerable<string> ListarPlantillas();
+        Task<bool> enviarMail(MailDto parametros);
     }
 }

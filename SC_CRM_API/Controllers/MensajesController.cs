@@ -49,9 +49,16 @@ namespace SC_CRM_API.Controllers
             {
                 return NotFound();
             }
+        }
 
+        [HttpPost("enviarMail")] //--LISTO
+        public async Task<IActionResult> generarMail([FromBody] MailDto datos)
+        {
+            var verificarSalida = await _mensajeria.enviarMail(datos);
+            return Ok(verificarSalida);
 
         }
+
 
 
 

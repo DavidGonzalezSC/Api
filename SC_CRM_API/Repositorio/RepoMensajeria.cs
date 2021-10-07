@@ -79,54 +79,67 @@ namespace SC_CRM_API.Repositorio
               ///  return false;
         }
 
-        public async Task<bool> crear_cuerpoAsync(TransaccionDto transacc, MailDto parametros)
+        public async Task<Email> crear_cuerpoAsync(PresupuestoDevueltoDbDto transacc, string comentarios)
         {
             //--Levantar Plantilla
-            string path = AppDomain.CurrentDomain.BaseDirectory + "\\Plantillas\\" + parametros.Plantilla + ".html";
+            string codsucursal = transacc.Sucursal;
+            if (codsucursal == "TP")
+                codsucursal = "TH";
+
+            string path = AppDomain.CurrentDomain.BaseDirectory + "\\Plantillas\\presupuesto.html";
             string plantilla = "";
-            string constante = "<tr><th>**SKU**</th><th>**DESCRIPCION**</th><th>**CANTIDAD**</th><th>**IMPORTE**</th></tr>";
+            string constante = "<tr><td style=\"text-align:right; border-bottom: 1pt solid black;\">**CANTIDAD**</td><td style=\"text-align:left; border-bottom: 1pt solid black;\">**DESCRIPCION**</td><td style=\"text-align:right; border-bottom: 1pt solid black;\">**IMPORTESINDESC**</td><th style=\"text-align:right; border-bottom: 1pt solid black;\">**IMPORTE**</th></tr>";
             string renglonesParaAgregar = string.Empty;
 
             if (File.Exists(path))
                 plantilla = await File.ReadAllTextAsync(path);
             else
-                return false;
+                return null;
 
 
             if (string.IsNullOrEmpty(plantilla))
-                return false;
+                return null;
 
 
             //--Reemplazar en la plantilla
-            string reemplazo_1 = plantilla.Replace("**CONTACTO**", transacc.Cliente.RazonSocial);
-
+            string reemplazo_0 = plantilla.Replace("**FECHA**", transacc.Presupuesto.FechaDeCotizacion.ToLongDateString());
+            string reemplazo_1 = reemplazo_0.Replace("**CONTACTO**", transacc.Cliente.RazonSocial);
+            decimal totalGeneral = 0;
             foreach (var renglon in transacc.DetallesDto)
             {
-                string agregar = constante.Replace("**SKU**", renglon.CodigoArticulo);
-                string agregar_2 = agregar.Replace("**DESCRIPCION**", renglon.Descripcion);
+                var importeCondesc = renglon.Precio * (1 - renglon.Bonif / 100) * renglon.Cantidad;
+                string agregar_1 = constante.Replace("**IMPORTESINDESC**", Math.Round(renglon.Precio, 2).ToString("0,0.00"));
+                string agregar_2 = agregar_1.Replace("**DESCRIPCION**", $"{renglon.Descripcion}({renglon.CodigoArticulo})");
                 string agregar_3 = agregar_2.Replace("**CANTIDAD**", Math.Truncate(renglon.Cantidad).ToString());
-                string agregar_4 = agregar_3.Replace("**IMPORTE**", Math.Truncate(renglon.Precio).ToString());
+                string agregar_4 = agregar_3.Replace("**IMPORTE**", Math.Round(importeCondesc, 2).ToString("0,0.00"));
+                totalGeneral = totalGeneral  + Math.Round(renglon.Precio, 2);
                 renglonesParaAgregar += agregar_4;
             }
 
-            string reemplazo_2 = reemplazo_1.Replace("**RENGLONES**", renglonesParaAgregar);
-            string reemplazo_3 = reemplazo_2.Replace("**FIRMA**", "Guille el Loco");
+            string reemplazo_2 = reemplazo_1.Replace("**IMPORTETOTAL**", Math.Round(totalGeneral, 2).ToString("0,0.00"));
+            string reemplazo_3 = reemplazo_2.Replace("**RENGLONES**", renglonesParaAgregar);
+            string reemplazo_4 = reemplazo_3.Replace("**COMENTARIOS**", comentarios);
+            string reemplazo_5 = reemplazo_4.Replace("**FECHACADUCA**", transacc.Presupuesto.FechaDeCotizacion.AddDays(1).ToLongDateString());
+            string reemplazo_6 = reemplazo_5.Replace("**FIRMA**", ""); //AGREGAR AL VENDEDOR
+            string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/firmas/{codsucursal}.jpg");
+            
 
 
 
             //-- Escribir el Mail
             Email mensaje = new Email();
-            mensaje.Asunto = "Prueba de PRESUPUESTO";
+            mensaje.Asunto = "PRESUPUESTO SOMMIERCENTER";
             mensaje.De = 1100;
-            mensaje.Para = "desarrollo@sommiercenter.com";
-            mensaje.Cuerpo = reemplazo_3;
+            mensaje.Para = transacc.Cliente.Email.ToLower().Trim();
+            mensaje.CCO = "desarrollo@sommiercenter.com";
+            mensaje.Cuerpo = reemplazo_7;
             mensaje.HTML = true;
             mensaje.TmeStamp = DateTime.Now;
             mensaje.Usuario = Environment.UserName;
 
             //enviar mail
 
-            return true;
+            return mensaje;
 
         }
 
@@ -238,6 +251,45 @@ namespace SC_CRM_API.Repositorio
 
                 } 
             }
+        }
+
+        public async Task<bool> enviarMail(MailDto presupuesto)
+        {
+            var encontrarDatos = await ObtenerPresupuesto(presupuesto);
+
+            if (string.IsNullOrEmpty(presupuesto.Observaciones))
+                presupuesto.Observaciones = "";
+
+            Email mensjeParaEnvio = await crear_cuerpoAsync(encontrarDatos, presupuesto.Observaciones);
+
+            if (mensjeParaEnvio != null)
+                return await guardarParaEnvio(mensjeParaEnvio);
+            else
+                return false;
+        }
+
+        private async Task<PresupuestoDevueltoDbDto> ObtenerPresupuesto(MailDto datos)
+        {
+            Sucursal contexto = await credencialesAsync(datos.Sucursal);
+            if (contexto == null)
+                return null;
+
+            PresupuestoDevueltoDbDto presupuestoAImprimir = new PresupuestoDevueltoDbDto();
+            presupuestoAImprimir.NumeroPedido = datos.Presupuesto;
+            presupuestoAImprimir.Sucursal = datos.Sucursal;
+
+            //--Levantar Data
+            await using (var _crmDbContext = new CrmContexto(contexto))
+            {
+                presupuestoAImprimir.Presupuesto = await _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == datos.Presupuesto).FirstOrDefaultAsync();
+                presupuestoAImprimir.DetallesDto = await _crmDbContext.DetallesParaConsultaVista.Where(i => i.IdPresupuesto == datos.Presupuesto).ToListAsync();
+                presupuestoAImprimir.Cliente = await _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuestoAImprimir.Presupuesto.IdCliente).FirstOrDefaultAsync();
+            }
+
+            if (presupuestoAImprimir.Presupuesto == null || presupuestoAImprimir.DetallesDto.Count < 1)
+                return null;
+            else
+                return presupuestoAImprimir;
         }
     }
 }
