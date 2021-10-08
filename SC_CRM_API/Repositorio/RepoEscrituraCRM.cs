@@ -155,7 +155,6 @@ namespace SC_CRM_API.Repositorio
         public async Task<bool> EliminarPedido(AnularpedidoDto anularDto)
         {
 
-
             if (!anularDto.Nro_Pedido.StartsWith(" "))
                 anularDto.Nro_Pedido = $" {anularDto.Nro_Pedido}";
 
@@ -215,7 +214,9 @@ namespace SC_CRM_API.Repositorio
                         else
                         {
                             transac.ClienteSave = true;
-                            transac.ListaDePedidos.Add(escritoCliente.Comprobante);
+                            List<string> clientes = new List<string>();
+                            clientes.Add(escritoCliente.Comprobante);
+                            transac.ListaDePedidos.Add(clientes);
                             //cliente escribio bien..pasamos a domicilio
                             //--domicilio
                             List<SqlRespuestaDomicilios> listaDeEscritoDomicilio = new List<SqlRespuestaDomicilios>();
@@ -251,12 +252,14 @@ namespace SC_CRM_API.Repositorio
                             else
                             {
 
-
                                 //domicilio escribio bien pasamos al presupuesto
+                                List<string> domiciliosOK = new List<string>();
+                                
                                 foreach (var item in listaDeEscritoDomicilio)
                                 {
-                                    transac.ListaDePedidos.Add(item.Comprobante);
+                                    domiciliosOK.Add(item.Comprobante);
                                 }
+                                transac.ListaDePedidos.Add(domiciliosOK);
                                 transac.DomicEntregaSave = true;
 
                                 transac.Presupuesto.IdDeSucursal = Convert.ToInt32(0); //paso el dato del cliente
@@ -297,7 +300,9 @@ namespace SC_CRM_API.Repositorio
                                 }
                                 else
                                 {
-                                    transac.ListaDePedidos.Add(escritoPresupuesto.Comprobante);
+                                    List<string> pedidosOk = new List<string>();
+                                    pedidosOk.Add(escritoPresupuesto.Comprobante);
+                                    transac.ListaDePedidos.Add(pedidosOk);
                                     transac.PresupuestoSave = true;
                                     transac.EscrituraExitosa = true;
 
@@ -323,7 +328,7 @@ namespace SC_CRM_API.Repositorio
 
                                         var listadoDeTango = EscribirEnTango(transac.IdGlobal, contextoDeEscritura);
                                         transac.TangoSave = true;
-
+                                        List<string> pedidosTangoOk = new List<string>();
                                         foreach (SqlRespuesta pedido in listadoDeTango)
                                         {
                                             if (pedido.Resultado.Contains("Error"))
@@ -332,13 +337,17 @@ namespace SC_CRM_API.Repositorio
                                                 transac.ListaDeErrores.Add($"Llamada: SP de Tango - ERROR SQL: {pedido.Error_Mensaje}");
                                             }else
                                             {
-                                                transac.ListaDePedidos.Add(pedido.Comprobante);
+
+                                                pedidosTangoOk.Add(pedido.Comprobante);
+                                                
                                            
                                             }
                                         
                                         }
+                                        transac.ListaDePedidos.Add(pedidosTangoOk);
 
-                                    }else
+                                    }
+                                    else
                                     {
                                         transac.TangoSave = true;
                                     }
@@ -640,12 +649,12 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-
         //-- Validaciones
         public async Task<ValidacionesPedido> validarPedido(Transaccion transac, CrmContexto contexto)
         {
             var reglasEnUso = await _validaciones.ConjuntoDereglas(transac.Sucursal);
             var validacionesRealizadas = new ValidacionesPedido();
+            validacionesRealizadas.PedidoValido = true;
             int cuentaRenglones = 0;
 
             //--Validaciones de SP antes que los renglones porque es a nivel PEDIDO
@@ -741,14 +750,6 @@ namespace SC_CRM_API.Repositorio
             }
 
             //--ValidarcontraSP
-
-
-
-
-
-
-
-
             return validacionesRealizadas;
 
         }

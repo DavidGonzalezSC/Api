@@ -139,7 +139,8 @@ namespace SC_CRM_API.Controllers
 
             }else
             {
-                escribio.ListaDePedidos.Insert(0, "OK");
+                List<string> okapia = new List<string> { "OK" };
+                escribio.ListaDePedidos.Insert(0, okapia);
                 return Ok(escribio.ListaDePedidos);
             }
 

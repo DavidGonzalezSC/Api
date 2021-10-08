@@ -14,6 +14,7 @@ namespace SC_CRM_API.Helpers.Validaciones
 
         public ReglasDeValidacion()
         {
+            //-- CAMBIAR EN PRODUCTIVO
             cliente.BaseAddress = new Uri("http://192.168.0.18:6370/api/validar/");
             cliente.DefaultRequestHeaders.Accept.Clear();
             cliente.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -30,7 +31,7 @@ namespace SC_CRM_API.Helpers.Validaciones
             nuevo.ListaSpConsulta = await traerListaSpConsulta(sucursal);
             nuevo.ListaSpBloqueantes = await traerListaSpBloqueantes(sucursal);
 
-
+            cliente.Dispose();
             return nuevo;
         }
 

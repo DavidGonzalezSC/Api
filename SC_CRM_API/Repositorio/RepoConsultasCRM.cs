@@ -159,7 +159,10 @@ namespace SC_CRM_API.Repositorio
             {
                 presupuesto.Presupuesto = _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == Convert.ToInt32(IdPresupuesto)).FirstOrDefault();
                 presupuesto.Cliente = _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuesto.Presupuesto.IdCliente).FirstOrDefault();
-                presupuesto.DetallesDto = _crmDbContext.DetallesParaConsultaVista.Where(d => d.IdPresupuesto == presupuesto.Presupuesto.IdPresupuesto).ToList();
+                presupuesto.DetallesDto = _crmDbContext.DetallesParaConsultaVista
+                    .Where(d => d.IdPresupuesto == presupuesto.Presupuesto.IdPresupuesto)
+                    .OrderBy(cul => cul.IdOrden)
+                    .ToList();
                 presupuesto.DireccionesDeEntrega = _crmDbContext.DireccionDeEntregaParaConsulta.Where(e => e.IdCliente == presupuesto.Cliente.IdCliente).ToList();
 
             }
