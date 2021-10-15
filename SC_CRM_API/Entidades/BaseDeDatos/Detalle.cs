@@ -234,8 +234,8 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [NotMapped]
         public string NombreDomicilio { get; set; } //utilizado para pasar la definicion desde el renglon de domicilio y matchear cuando se escriben con el Id retiornado por el SP de sucursales
         
-        [NotMapped]
-        public IEnumerable<string> CodigosValidados = new List<string>(); //utilizado para alojar los SP que se quieran puentear
+        //[NotMapped]
+        //public IEnumerable<string> CodigosValidados = new List<string>(); //utilizado para alojar los SP que se quieran puentear
 
     }
 

@@ -160,7 +160,6 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("Cod_Deposito")]                                                                //[varchar](2) NOT NULL,
         public string CodigoDeDeposito { get; set; }
 
-        
         [Column("Bonif")]                                                                       //[decimal](4, 2) NOT NULL,
         public decimal Bonificacion { get; set; }
 
@@ -323,6 +322,8 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("CA_NPSMsgRespuesta")]															//[varchar](255) NULL,
         public string NpsMsgRespuesta { get; set; }
 
+        //[NotMapped]
+        //public IEnumerable<string> CodigosValidados = new List<string>(); //utilizado para alojar los SP que se quieran puentear
 
     }
 

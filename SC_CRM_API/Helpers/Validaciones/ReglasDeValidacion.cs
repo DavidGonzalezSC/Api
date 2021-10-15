@@ -10,32 +10,38 @@ namespace SC_CRM_API.Helpers.Validaciones
 {
     public class ReglasDeValidacion : IValidaciones
     {
-        static HttpClient cliente = new HttpClient();
+        
 
         public ReglasDeValidacion()
         {
             //-- CAMBIAR EN PRODUCTIVO
-            cliente.BaseAddress = new Uri("http://192.168.0.18:6370/api/validar/");
-            cliente.DefaultRequestHeaders.Accept.Clear();
-            cliente.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //cliente.BaseAddress = new Uri("http://192.168.0.18:6370/api/validar/");
+            //cliente.DefaultRequestHeaders.Accept.Clear();
+            //cliente.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<ConjuntoDeValidacion> ConjuntoDereglas(string sucursal)
         {
-            ConjuntoDeValidacion nuevo = new ConjuntoDeValidacion();
-            nuevo.ListaDeDepoTransporte = await DepoyTrasnporte();
-            nuevo.ListaDeArticulosPorProveedor = await ArticulosPorProveedor();
-            nuevo.ListaDeExcepcionesComerciales = await ExcepcionesComerciales();
-            nuevo.ListaDeInactivos = await ListaDeInactivos();
-            nuevo.ListaDeTransportes = await Transportes();
-            nuevo.ListaSpConsulta = await traerListaSpConsulta(sucursal);
-            nuevo.ListaSpBloqueantes = await traerListaSpBloqueantes(sucursal);
 
-            cliente.Dispose();
+            ConjuntoDeValidacion nuevo = new ConjuntoDeValidacion();
+            using (var cliente = new HttpClient())
+            {
+                cliente.BaseAddress = new Uri("http://10.0.0.7:6370/api/validar/");
+                cliente.DefaultRequestHeaders.Accept.Clear();
+                cliente.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                nuevo.ListaDeDepoTransporte = await DepoyTrasnporte(cliente);
+                nuevo.ListaDeArticulosPorProveedor = await ArticulosPorProveedor(cliente);
+                nuevo.ListaDeExcepcionesComerciales = await ExcepcionesComerciales(cliente);
+                nuevo.ListaDeInactivos = await ListaDeInactivos(cliente);
+                nuevo.ListaDeTransportes = await Transportes(cliente);
+                nuevo.ListaSpConsulta = await traerListaSpConsulta(cliente, sucursal);
+                nuevo.ListaSpBloqueantes = await traerListaSpBloqueantes(cliente, sucursal);
+
+            }
             return nuevo;
         }
 
-        public async Task<List<ValidarArticuloProveedor>> ArticulosPorProveedor()
+        public async Task<List<ValidarArticuloProveedor>> ArticulosPorProveedor(HttpClient cliente)
         {
             //ObtenerProveedores
             var dataProcesada = new List<ValidarArticuloProveedor>();
@@ -58,7 +64,7 @@ namespace SC_CRM_API.Helpers.Validaciones
         }
 
 
-        public async Task<List<SucursalesValidarDepoTransporte>> DepoyTrasnporte()
+        public async Task<List<SucursalesValidarDepoTransporte>> DepoyTrasnporte(HttpClient cliente)
         {
             var dataProcesada = new List<SucursalesValidarDepoTransporte>();
 
@@ -79,7 +85,7 @@ namespace SC_CRM_API.Helpers.Validaciones
             return dataProcesada;
         }
 
-        public async Task<List<ValidarExcepcionComercial>> ExcepcionesComerciales()
+        public async Task<List<ValidarExcepcionComercial>> ExcepcionesComerciales(HttpClient cliente)
         {
             var dataProcesada = new List<ValidarExcepcionComercial>();
 
@@ -100,7 +106,7 @@ namespace SC_CRM_API.Helpers.Validaciones
             return dataProcesada;
         }
 
-        public async Task<List<ValidarInactivos>> ListaDeInactivos()
+        public async Task<List<ValidarInactivos>> ListaDeInactivos(HttpClient cliente)
         {
             
             var dataProcesada = new List<ValidarInactivos>();
@@ -122,7 +128,7 @@ namespace SC_CRM_API.Helpers.Validaciones
             return dataProcesada;
         }
 
-        public async Task<List<Transportes>> Transportes()
+        public async Task<List<Transportes>> Transportes(HttpClient cliente)
         {
             var dataProcesada = new List<Transportes>();
 
@@ -143,17 +149,19 @@ namespace SC_CRM_API.Helpers.Validaciones
             return dataProcesada;
         }
 
-        public async Task<List<ValidacionesSPConsulta>> traerListaSpConsulta(string sucursal)
+        public async Task<List<ValidacionesSPConsulta>> traerListaSpConsulta(HttpClient cliente, string sucursal)
         {
             var dataProcesada = new List<ValidacionesSPConsulta>();
 
             try
             {
+                sucursal = sucursal.ToLower();
                 var respuesta = await cliente.GetStringAsync($"SpConsulta/{sucursal}");
                 dataProcesada = JsonConvert.DeserializeObject<List<ValidacionesSPConsulta>>(respuesta);
             }
-            catch (HttpRequestException)
+            catch (HttpRequestException es)
             {
+                Console.WriteLine(es.Message);
                 ValidacionesSPConsulta mal = new ValidacionesSPConsulta();
                 mal.Codigo = "404";
                 mal.Nombre = "404";
@@ -164,7 +172,7 @@ namespace SC_CRM_API.Helpers.Validaciones
             return dataProcesada;
         }
 
-        public async Task<List<ValidacionesSPBloqueantes>> traerListaSpBloqueantes(string sucursal)
+        public async Task<List<ValidacionesSPBloqueantes>> traerListaSpBloqueantes(HttpClient cliente, string sucursal)
         {
             var dataProcesada = new List<ValidacionesSPBloqueantes>();
 
@@ -185,7 +193,7 @@ namespace SC_CRM_API.Helpers.Validaciones
             return dataProcesada;
         }
 
-        public async Task<List<ValidacionesDepoDeFabricantes>> traerFabricantes()
+        public async Task<List<ValidacionesDepoDeFabricantes>> traerFabricantes(HttpClient cliente)
         {
             var dataProcesada = new List<ValidacionesDepoDeFabricantes>();
 

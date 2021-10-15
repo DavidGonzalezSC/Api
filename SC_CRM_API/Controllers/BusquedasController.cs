@@ -137,6 +137,17 @@ namespace SC_CRM_API.Controllers
 
         }
 
+        [HttpGet("{sucursal}/presupuestocabecera/{IdPresupuesto}")]
+        public async Task<IActionResult> obtenerCabecera([FromRoute] string sucursal, [FromRoute] string IdPresupuesto)
+        {
+            var presupuesto = await _consultas.obtenerPresupuesto(sucursal, IdPresupuesto);
+            if (presupuesto != null)
+                return Ok(presupuesto.Presupuesto);
+            else
+                return NotFound();
+
+        }
+
         //--PEDIDOS
         /* Desactivada
         [HttpGet("{sucursal}/pedidos/{Talonario}/{NroPedido}")]

@@ -121,8 +121,9 @@ namespace SC_CRM_API.Repositorio
             string reemplazo_4 = reemplazo_3.Replace("**COMENTARIOS**", comentarios);
             string reemplazo_5 = reemplazo_4.Replace("**FECHACADUCA**", transacc.Presupuesto.FechaDeCotizacion.AddDays(1).ToLongDateString());
             string reemplazo_6 = reemplazo_5.Replace("**FIRMA**", ""); //AGREGAR AL VENDEDOR
-            string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/firmas/{codsucursal}.jpg");
-            
+            //string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/firmas/{codsucursal}.jpg");
+            string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/mail/plantilla/presupuesto_pie.jpg");
+
 
 
 
