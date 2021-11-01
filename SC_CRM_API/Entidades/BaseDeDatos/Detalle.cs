@@ -231,6 +231,9 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("CA_EspesorME")]
         public int? Espesor_ME { get; set; }
 
+        [Column("CA_ComentarioAdicional")]
+        public string ComentarioAdicional { get; set; }
+
         [NotMapped]
         public string NombreDomicilio { get; set; } //utilizado para pasar la definicion desde el renglon de domicilio y matchear cuando se escriben con el Id retiornado por el SP de sucursales
         
@@ -396,6 +399,9 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         [Column("CA_EspesorME")]
         public int? Espesor_ME { get; set; }
+
+        [Column("CA_ComentarioAdicional")]
+        public string ComentarioAdicional { get; set; }
     }
 }
 

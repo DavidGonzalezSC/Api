@@ -14,7 +14,7 @@ namespace SC_CRM_API.Entidades.Dtos
     public class PedidoDtoCabecera
     {
         
-        public Int16 TalonPedido { get; set; }
+        public Int16? TalonPedido { get; set; }
         public string Nro_Pedido { get; set; }
         public string Cod_Cliente { get; set; }
         public string RazonSocial { get; set; }
@@ -27,10 +27,10 @@ namespace SC_CRM_API.Entidades.Dtos
         public string Lista { get; set; }
         public string CodSucursal { get; set; }
         public string Email { get; set; }
-        public DateTime FechaPedido { get; set; }
+        public DateTime? FechaPedido { get; set; }
         public string Clasificacion { get; set; }
         public string Cuit { get; set; }
-        public DateTime FechaDeEntrega { get; set; }
+        public DateTime? FechaDeEntrega { get; set; }
         public string LeyendaDeEntrega { get; set; }
         public string Comentarios { get; set; }
         public string Transporte { get; set; }
@@ -54,14 +54,14 @@ namespace SC_CRM_API.Entidades.Dtos
         public string Cod_articulo { get; set; }
         public string Descripcion { get; set; }
         public string Descripcion_Adicional { get; set; }
-        public int Cantidad { get; set; }
-        public decimal Descuento { get; set; }
-        public decimal Precio { get; set; }
+        public int? Cantidad { get; set; }
+        public decimal? Descuento { get; set; }
+        public decimal? Precio { get; set; }
         public bool IncluyeIva { get; set; }
         public string DescripcionDelPedido { get; set; }
         public string DescripcionDelPedidoAdicional { get; set; }
-        public int MedidaEspecial_Ancho { get; set; }
-        public int MedidaEspecial_Largo { get; set; }
-        public int MedidaEspecial_Espesor { get; set; }
+        public int? MedidaEspecial_Ancho { get; set; }
+        public int? MedidaEspecial_Largo { get; set; }
+        public int? MedidaEspecial_Espesor { get; set; }
     }
 }

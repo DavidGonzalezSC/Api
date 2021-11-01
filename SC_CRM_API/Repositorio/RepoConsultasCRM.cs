@@ -187,7 +187,7 @@ namespace SC_CRM_API.Repositorio
 
             if(renglones != null)
             {
-                pedido.Cabecera.TalonPedido = renglones.First().TalonPedido;
+                pedido.Cabecera.TalonPedido = (short)renglones.First().TalonPedido;
                 pedido.Cabecera.Nro_Pedido = renglones.First().Nro_Pedido;
                 pedido.Cabecera.Cod_Cliente = renglones.First().Cod_Cliente.Trim();
                 pedido.Cabecera.RazonSocial = renglones.First().RazonSocial.Trim();
@@ -196,41 +196,69 @@ namespace SC_CRM_API.Repositorio
                 pedido.Cabecera.Domicilio = renglones.First().Domicilio.Trim();
                 pedido.Cabecera.CodPostal = renglones.First().CodPostal.Trim();
                 pedido.Cabecera.Localidad = renglones.First().Localidad.Trim();
-                pedido.Cabecera.Vendedor = renglones.First().Vendedor.Trim();
-                pedido.Cabecera.Lista = renglones.First().Lista.Trim();
+                try
+                {
+                    if (string.IsNullOrEmpty(renglones.FirstOrDefault().Vendedor))
+                        pedido.Cabecera.Vendedor = "";
+                    else
+                    pedido.Cabecera.Vendedor = renglones.FirstOrDefault().Vendedor.Trim();
+
+                }
+                catch (Exception)
+                {
+
+                    pedido.Cabecera.Vendedor = "";
+                }
+
+                if(string.IsNullOrEmpty(renglones.First().Lista))
+                    pedido.Cabecera.Lista = "";
+                else
+                    pedido.Cabecera.Lista = renglones.First().Lista.Trim();
+
                 pedido.Cabecera.CodSucursal = renglones.First().CodSucursal.Trim();
                 pedido.Cabecera.Email = renglones.First().Email.Trim();
-                pedido.Cabecera.FechaPedido = renglones.First().FechaPedido;
-                pedido.Cabecera.Clasificacion = renglones.First().Clasificacion.Trim();
+                pedido.Cabecera.FechaPedido = (DateTime)renglones.First().FechaPedido;
+
+                if(string.IsNullOrEmpty(renglones.First().Clasificacion))
+                    pedido.Cabecera.Clasificacion = "";
+                else
+                    pedido.Cabecera.Clasificacion = renglones.First().Clasificacion.Trim();
+
+
                 pedido.Cabecera.Cuit = renglones.First().Cuit.Trim();
-                pedido.Cabecera.FechaDeEntrega = renglones.First().FechaDeEntrega;
-                pedido.Cabecera.LeyendaDeEntrega = renglones.First().LeyendaDeEntrega.Trim();
-                pedido.Cabecera.Comentarios = renglones.First().Comentarios.Trim();
-                pedido.Cabecera.Transporte = renglones.First().Transporte.Trim();
-                pedido.Cabecera.Leyenda_1 = renglones.First().Leyenda_1.Trim();
-                pedido.Cabecera.Leyenda_2 = renglones.First().Leyenda_2.Trim();
-                pedido.Cabecera.RangoHorario = renglones.First().RangoHorario.Trim();
-                pedido.Cabecera.Entrega_Calle = renglones.First().Entrega_Calle.Trim();
-                pedido.Cabecera.Entrega_Numero = renglones.First().Entrega_Numero.Trim();
-                pedido.Cabecera.Entrega_Piso = renglones.First().Entrega_Piso.Trim();
-                pedido.Cabecera.Entrega_Depto = renglones.First().Entrega_Depto.Trim();
-                pedido.Cabecera.Entrega_CP = renglones.First().Entrega_CP.Trim();
-                pedido.Cabecera.Entrega_Localidad = renglones.First().Entrega_Localidad.Trim();
-                pedido.Cabecera.Entrega_Provincia = renglones.First().Entrega_Provincia.Trim();
-                pedido.Cabecera.Entrega_Pais = renglones.First().Entrega_Pais.Trim();
+                pedido.Cabecera.FechaDeEntrega = (DateTime)renglones.First().FechaDeEntrega;
+                pedido.Cabecera.LeyendaDeEntrega = renglones.First().LeyendaDeEntrega;
+                pedido.Cabecera.Comentarios = renglones.First().Comentarios;
+                pedido.Cabecera.Transporte = renglones.First().Transporte;
+                pedido.Cabecera.Leyenda_1 = renglones.First().Leyenda_1;
+                pedido.Cabecera.Leyenda_2 = renglones.First().Leyenda_2;
+                pedido.Cabecera.RangoHorario = renglones.First().RangoHorario;
+                pedido.Cabecera.Entrega_Calle = renglones.First().Entrega_Calle;
+                pedido.Cabecera.Entrega_Numero = renglones.First().Entrega_Numero;
+                pedido.Cabecera.Entrega_Piso = renglones.First().Entrega_Piso;
+                pedido.Cabecera.Entrega_Depto = renglones.First().Entrega_Depto;
+                pedido.Cabecera.Entrega_CP = renglones.First().Entrega_CP;
+                pedido.Cabecera.Entrega_Localidad = renglones.First().Entrega_Localidad;
+                pedido.Cabecera.Entrega_Provincia = renglones.First().Entrega_Provincia;
+                pedido.Cabecera.Entrega_Pais = renglones.First().Entrega_Pais;
 
                 foreach (var item in renglones)
                 {
 
                     PedidoDtoDetalle nuevoRenglon = new PedidoDtoDetalle();
-                    nuevoRenglon.Renglon = item.Renglon;
+                    nuevoRenglon.Renglon = (int)item.Renglon;
                     nuevoRenglon.Cod_articulo = item.Cod_articulo;
                     nuevoRenglon.Descripcion = item.Descripcion;
                     nuevoRenglon.Descripcion_Adicional = item.Descripcion_Adicional;
                     nuevoRenglon.Cantidad = item.Cantidad;
                     nuevoRenglon.Descuento = item.Descuento;
                     nuevoRenglon.Precio = item.Precio;
-                    nuevoRenglon.IncluyeIva = item.IncluyeIva;
+
+                    if(item.IncluyeIva == null)
+                        nuevoRenglon.IncluyeIva = false;
+                    else
+                        nuevoRenglon.IncluyeIva = (bool)item.IncluyeIva;
+
                     nuevoRenglon.DescripcionDelPedido = item.DescripcionDelPedido;
                     nuevoRenglon.DescripcionDelPedidoAdicional = item.DescripcionDelPedidoAdicional;
                     nuevoRenglon.MedidaEspecial_Ancho = item.MedidaEspecial_Ancho;

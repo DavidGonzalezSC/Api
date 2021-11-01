@@ -10,7 +10,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
     public class PedidoDeConsulta
     {
         [Column("TALON_PED")]
-        public Int16 TalonPedido { get; set; }
+        public Int16? TalonPedido { get; set; }
         [Column("NRO_PEDIDO")]
         public string Nro_Pedido { get; set; }
         [Column("COD_CLIENT")]
@@ -36,13 +36,13 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("E_MAIL")]
         public string Email { get; set; }
         [Column("Fecha_Pedido")]
-        public DateTime FechaPedido { get; set; }
+        public DateTime? FechaPedido { get; set; }
         [Column("Clasificacion")]
         public string Clasificacion { get; set; }
         [Column("CUIT")]
         public string Cuit { get; set; }
         [Column("Fecha_Entrega")]
-        public DateTime FechaDeEntrega { get; set; }
+        public DateTime? FechaDeEntrega { get; set; }
         [Column("LeyendaFechaEntrega")]
         public string LeyendaDeEntrega { get; set; }
         [Column("Comentarios")]
@@ -72,7 +72,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("Nombre_Pais")]
         public string Entrega_Pais { get; set; }
         [Column("Renglon")]
-        public int Renglon { get; set; }
+        public int? Renglon { get; set; }
         [Column("COD_ARTICU")]
         public string Cod_articulo { get; set; }
         [Column("DESCRIPCIO")]
@@ -80,22 +80,22 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("DESC_ADIC")]
         public string Descripcion_Adicional { get; set; }
         [Column("Cantidad")]
-        public int Cantidad { get; set; }
+        public int? Cantidad { get; set; }
         [Column("Descuento")]
-        public decimal Descuento { get; set; }
+        public decimal? Descuento { get; set; }
         [Column("PrecioUnitario")]
-        public decimal Precio { get; set; }
+        public decimal? Precio { get; set; }
         [Column("INCLUY_IVA")]
-        public bool IncluyeIva { get; set; }
+        public bool? IncluyeIva { get; set; }
         [Column("DescripcionPedido")]
         public string DescripcionDelPedido { get; set; }
         [Column("DescripcionAdicionalPedido")]
         public string DescripcionDelPedidoAdicional { get; set; }
         [Column("Ancho_ME")]
-        public int MedidaEspecial_Ancho { get; set; }
+        public int? MedidaEspecial_Ancho { get; set; }
         [Column("Largo_ME")]
-        public int MedidaEspecial_Largo { get; set; }
+        public int? MedidaEspecial_Largo { get; set; }
         [Column("Espesor_ME")]
-        public int MedidaEspecial_Espesor { get; set; }
+        public int? MedidaEspecial_Espesor { get; set; }
     }
 }

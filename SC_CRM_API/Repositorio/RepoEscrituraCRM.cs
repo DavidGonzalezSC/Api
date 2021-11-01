@@ -175,7 +175,6 @@ namespace SC_CRM_API.Repositorio
         {
 
             Sucursal sucursal = await credencialesAsync(transac.Sucursal);
-            //--Validaciones pasadas
 
             transac.Cliente.Sucursal = transac.Sucursal;
             transac.Cliente.IdEvento = transac.IdGlobal;
@@ -199,7 +198,13 @@ namespace SC_CRM_API.Repositorio
                     await using (var transaccion = contextoDeEscritura.Database.BeginTransaction())
                     {
 
+                        //--Agregar la lista de precios al cliente antes de escribirlo
+                        transac.Cliente.ListaDePrecios = transac.Detalles.First().CodigoListaPrecio.Value;
+
+
+
                         contextoDeEscritura.Clientes.Add(transac.Cliente);
+
                         salidaCliente = contextoDeEscritura.SaveChanges();
                         //--SP de Cliente
                         var escritoCliente = EscribirClienteSP(transac.IdGlobal, contextoDeEscritura);
@@ -262,7 +267,7 @@ namespace SC_CRM_API.Repositorio
                                 transac.ListaDePedidos.Add(domiciliosOK);
                                 transac.DomicEntregaSave = true;
 
-                                transac.Presupuesto.IdDeSucursal = Convert.ToInt32(0); //paso el dato del cliente
+                                transac.Presupuesto.IdDeSucursal = Convert.ToInt32(listaDeEscritoDomicilio.First().Comprobante); //paso el dato del cliente
                                 transac.Presupuesto.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato del cliente
 
                                 contextoDeEscritura.Presupuestos.Add(transac.Presupuesto);

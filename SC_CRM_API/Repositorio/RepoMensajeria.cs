@@ -62,6 +62,11 @@ namespace SC_CRM_API.Repositorio
             if (presupuestoAImprimir.Presupuesto == null || presupuestoAImprimir.DetallesDto.Count < 1)
                 return "";
 
+            //agregarle los comentarios adicionales como no se esta utilizando el campo comentaros en el cliente y no impacta en la DB
+            //lo piso para que sea transportable en el json dto que genera el pdf
+            if (presupuestoAImprimir.Sucursal == "TP")
+                presupuestoAImprimir.Sucursal = "TH";
+            presupuestoAImprimir.Cliente.Comentarios = parametros.Observaciones;
 
             //escribir el archivo json con la data
             string nombreArchivo = presupuestoAImprimir.Sucursal + "_" + presupuestoAImprimir.Identificador + ".json";
@@ -112,7 +117,7 @@ namespace SC_CRM_API.Repositorio
                 string agregar_2 = agregar_1.Replace("**DESCRIPCION**", $"{renglon.Descripcion}({renglon.CodigoArticulo})");
                 string agregar_3 = agregar_2.Replace("**CANTIDAD**", Math.Truncate(renglon.Cantidad).ToString());
                 string agregar_4 = agregar_3.Replace("**IMPORTE**", Math.Round(importeCondesc, 2).ToString("0,0.00"));
-                totalGeneral = totalGeneral  + Math.Round(renglon.Precio, 2);
+                totalGeneral = totalGeneral  + Math.Round(importeCondesc, 2);
                 renglonesParaAgregar += agregar_4;
             }
 
@@ -121,8 +126,8 @@ namespace SC_CRM_API.Repositorio
             string reemplazo_4 = reemplazo_3.Replace("**COMENTARIOS**", comentarios);
             string reemplazo_5 = reemplazo_4.Replace("**FECHACADUCA**", transacc.Presupuesto.FechaDeCotizacion.AddDays(1).ToLongDateString());
             string reemplazo_6 = reemplazo_5.Replace("**FIRMA**", ""); //AGREGAR AL VENDEDOR
-            //string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/firmas/{codsucursal}.jpg");
-            string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/mail/plantilla/presupuesto_pie.jpg");
+            string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/firmas/{codsucursal}.jpg");
+            //string reemplazo_7 = reemplazo_6.Replace("**FOOTER**", $"https://sommiercenter.com/media/mail/plantilla/presupuesto_pie.jpg");
 
 
 
