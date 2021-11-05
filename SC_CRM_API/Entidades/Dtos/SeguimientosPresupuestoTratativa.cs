@@ -10,6 +10,5 @@ namespace SC_CRM_API.Entidades.Dtos
         public int Idpresupuesto { get; set; }
         public string Comentarios { get; set; }
         public DateTime Prox_Contacto { get; set; }
-
     }
 }

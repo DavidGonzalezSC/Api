@@ -237,7 +237,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string PaginaWeb { get; set; }
 
         [Column("ListaPrecios")]                                                                    //[int] NULL,
-        public int ListaDePrecios { get; set; }
+        public int? ListaDePrecios { get; set; }
 
         [Column("Cond_Vta")]                                                                        //[int] NULL,
         public int CondicionDeVenta { get; set; }

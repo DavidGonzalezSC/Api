@@ -50,6 +50,8 @@ namespace SC_CRM_API.Repositorio
 
         }
 
+       
+
         public async Task<IEnumerable<TransaccionGuardada>> ListadoDePresupuestosAsync(string sucursal, int vendedor, int dias, string estados)
         {
             Sucursal contexto = await credencialesAsync(sucursal);

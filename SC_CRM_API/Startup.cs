@@ -41,6 +41,7 @@ namespace SC_CRM_API
             services.AddScoped<IConsultasCRM, RepoConsultasCRM>();
             services.AddScoped<IPresupuestos, RepoPresupuestos>();
             services.AddScoped<IMensajeria, RepoMensajeria>();
+            services.AddScoped<IMiscelaneos, RepoMiscelaneo>();
             services.AddControllers();
         }
 

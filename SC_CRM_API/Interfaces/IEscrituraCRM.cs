@@ -20,9 +20,6 @@ namespace SC_CRM_API.Interfaces
         public Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direccion);
         public Task<IEnumerable<string>> validarTransaccion(Transaccion transaccion);
 
-
-
-
         //--Pedidos
 
         //Validar Pedido

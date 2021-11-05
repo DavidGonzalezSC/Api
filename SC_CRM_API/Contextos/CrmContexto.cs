@@ -44,6 +44,10 @@ namespace SC_CRM_API.Contextos
 
         }
 
+        //--Mixtos
+        public DbSet<TratativaSinPResupuesto> TratativasDeSeguimientosSin { get; set; }
+
+
         //--Escritura
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<Presupuesto> Presupuestos { get; set; }
@@ -62,6 +66,7 @@ namespace SC_CRM_API.Contextos
         public DbSet <PedidoDeConsulta> PedidosParaConsulta { get; set; }
         public DbSet<PresupuestoPasadosAPedido> PresupuestosAPedidos { get; set; }
         public DbSet<PedidoDetalle> DetallesPedidos { get; set; }
+
 
     }
 }
