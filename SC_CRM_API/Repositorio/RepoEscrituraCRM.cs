@@ -692,61 +692,66 @@ namespace SC_CRM_API.Repositorio
             //--validar renglones
             foreach (Detalle item in transac.Detalles)
             {
-                cuentaRenglones++;
+                    cuentaRenglones++;
+
+                if (item.RenglonAPedido)
+                {
+
                 
-                //-- Validar Depo y Transporte
-                var validarDepoTransp = reglasEnUso.ListaDeDepoTransporte.Where(d => d.deposito == item.Campo_1 && d.transporte == item.Campo_3).Any();
-                if (!validarDepoTransp)
-                {
-                    string mensaje = $"Renglon {cuentaRenglones}: La combinación de depósito({item.Campo_1}) y transporte ({item.Campo_3})no es válida.";
-                    validacionesRealizadas.ListaDeErrores.Add(mensaje);
-                    validacionesRealizadas.PedidoValido = false;
-                }
-
-
-                //Inactivo Lmk
-                var validarInactivo = reglasEnUso.ListaDeInactivos.Where(d => d.CodArticu == item.CodigoArticulo && d.Deposito == item.Campo_1).Any();
-                if (validarInactivo)
-                {
-                    string mensaje = $"Renglon {cuentaRenglones}: El artículo ({item.CodigoArticulo}) se encuentra Inactivo para el deposito {item.Campo_1}";
-                    validacionesRealizadas.ListaDeErrores.Add(mensaje);
-                    validacionesRealizadas.PedidoValido = false;
-                }
-
-
-                //--Articulo Proveedor
-                var validarDepo = reglasEnUso.ListaFabricantes.Where(f => f.Deposito == item.Campo_1).Any();
-                if (validarDepo)
-                {
-                    var validarArtiProvee = reglasEnUso.ListaDeArticulosPorProveedor.Where(d => d.CodigoArticulo == item.CodigoArticulo && d.Deposito == item.Campo_1).Any();
-                    if (!validarArtiProvee)
+                    //-- Validar Depo y Transporte
+                    var validarDepoTransp = reglasEnUso.ListaDeDepoTransporte.Where(d => d.deposito == item.Campo_1 && d.transporte == item.Campo_3).Any();
+                    if (!validarDepoTransp)
                     {
-                        string mensaje = $"Renglon {cuentaRenglones}: El artículo ({item.CodigoArticulo}) no puede asignarse al depósito {item.Campo_1}";
-                        validacionesRealizadas.ListaDeErrores.Add(mensaje);
-                        validacionesRealizadas.PedidoValido = false;
-                    }
-                }
-
-
-                //Excepciones comerciales
-                var validarExcepcion = reglasEnUso.ListaDeExcepcionesComerciales.Where(d => d.Clasificacion == item.CodigoDescuento).Any();
-                if (!validarExcepcion)
-                {
-                    //--La clasificacion existe
-                    if(item.Bonif_2 > 0)
-                    {
-                        string mensaje = $"Renglon {cuentaRenglones}: Debe Clasificar el Renglón como Excepción comercial";
+                        string mensaje = $"Renglon {cuentaRenglones}: La combinación de depósito({item.Campo_1}) y transporte ({item.Campo_3})no es válida.";
                         validacionesRealizadas.ListaDeErrores.Add(mensaje);
                         validacionesRealizadas.PedidoValido = false;
                     }
 
-                }else
-                {
-                    if (item.Bonif_2 == 0)
+
+                    //Inactivo Lmk
+                    var validarInactivo = reglasEnUso.ListaDeInactivos.Where(d => d.CodArticu == item.CodigoArticulo && d.Deposito == item.Campo_1).Any();
+                    if (validarInactivo)
                     {
-                        string mensaje = $"Renglon {cuentaRenglones}: Debe Aplicar un Descuento Fuera de Pauta.";
+                        string mensaje = $"Renglon {cuentaRenglones}: El artículo ({item.CodigoArticulo}) se encuentra Inactivo para el deposito {item.Campo_1}";
                         validacionesRealizadas.ListaDeErrores.Add(mensaje);
                         validacionesRealizadas.PedidoValido = false;
+                    }
+
+
+                    //--Articulo Proveedor
+                    var validarDepo = reglasEnUso.ListaFabricantes.Where(f => f.Deposito == item.Campo_1).Any();
+                    if (validarDepo)
+                    {
+                        var validarArtiProvee = reglasEnUso.ListaDeArticulosPorProveedor.Where(d => d.CodigoArticulo == item.CodigoArticulo && d.Deposito == item.Campo_1).Any();
+                        if (!validarArtiProvee)
+                        {
+                            string mensaje = $"Renglon {cuentaRenglones}: El artículo ({item.CodigoArticulo}) no puede asignarse al depósito {item.Campo_1}";
+                            validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                            validacionesRealizadas.PedidoValido = false;
+                        }
+                    }
+
+
+                    //Excepciones comerciales
+                    var validarExcepcion = reglasEnUso.ListaDeExcepcionesComerciales.Where(d => d.Clasificacion == item.CodigoDescuento).Any();
+                    if (!validarExcepcion)
+                    {
+                        //--La clasificacion existe
+                        if(item.Bonif_2 > 0)
+                        {
+                            string mensaje = $"Renglon {cuentaRenglones}: Debe Clasificar el Renglón como Excepción comercial";
+                            validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                            validacionesRealizadas.PedidoValido = false;
+                        }
+
+                    }else
+                    {
+                        if (item.Bonif_2 == 0)
+                        {
+                            string mensaje = $"Renglon {cuentaRenglones}: Debe Aplicar un Descuento Fuera de Pauta.";
+                            validacionesRealizadas.ListaDeErrores.Add(mensaje);
+                            validacionesRealizadas.PedidoValido = false;
+                        }
                     }
                 }
 
@@ -758,10 +763,6 @@ namespace SC_CRM_API.Repositorio
             return validacionesRealizadas;
 
         }
-
-
-
-
 
         //--------------- No utilizadas -------------------------------
 

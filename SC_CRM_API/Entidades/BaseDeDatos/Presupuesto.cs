@@ -206,22 +206,22 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public int Prioridad { get; set; }
 
         [Column("Talonario_pedidos")]															//[int] NULL,
-        public int TalonarioDePedidos { get; set; }
+        public int? TalonarioDePedidos { get; set; }
 
         [Column("FechaCotizacion")]																//[datetime] NOT NULL,
         public DateTime FechaDeCotizacion { get; set; }
 
         [Column("ID_Proyecto")]																	//[int] NULL,
-        public int IdProyecto { get; set; }
+        public int? IdProyecto { get; set; }
 
         [Column("COD_CLASIF")]																	//[varchar](6) NOT NULL,
         public string CodigoDeClasificacion { get; set; }
 
         [Column("ID_Contacto")]																	//[int] NULL,
-        public int IdDeContacto { get; set; }
+        public int? IdDeContacto { get; set; }
 
         [Column("ID_Referencia")]																//[int] NULL,
-        public int IdDeReferencia { get; set; }
+        public int? IdDeReferencia { get; set; }
 
         [Column("NRO_O_COMP")]																	//[varchar](14) NOT NULL,
         public string NumeroDEComprobante { get; set; }
@@ -233,10 +233,10 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public int TalonarioDePedidosDos { get; set; }
 
         [Column("ID_Acopio")]																	//[int] NULL,
-        public int IdDeAcopio { get; set; }
+        public int? IdDeAcopio { get; set; }
 
         [Column("ID_Sucursal")]																	//[int] NULL,
-        public int IdDeSucursal { get; set; }
+        public int? IdDeSucursal { get; set; }
 
         [Column("Privado")]																		//[varchar](1) NOT NULL,
         public string Privado { get; set; }
@@ -260,7 +260,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string Perfil { get; set; }
 
         [Column("ID_subCategoria")]																//[int] NULL,
-        public int IdSubCategoria { get; set; }
+        public int? IdSubCategoria { get; set; }
 
         [Column("COD_ASIENTO_MODELO_GV")]														//[varchar](30) NOT NULL,
         public string CodigoAsientoModeloGv { get; set; }
@@ -414,7 +414,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public int Prioridad { get; set; }
 
         [Column("Talonario_pedidos")]															//[int] NULL,
-        public int TalonarioDePedidos { get; set; }
+        public int? TalonarioDePedidos { get; set; }
 
         [Column("FechaCotizacion")]																//[datetime] NOT NULL,
         public DateTime FechaDeCotizacion { get; set; }
@@ -438,7 +438,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public decimal PorcentajeDos { get; set; }
 
         [Column("Talonario_pedidos_2")]															//[int] NULL,
-        public int TalonarioDePedidosDos { get; set; }
+        public int? TalonarioDePedidosDos { get; set; }
 
         [Column("ID_Acopio")]																	//[int] NULL,
         public int? IdDeAcopio { get; set; }

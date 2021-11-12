@@ -76,7 +76,7 @@ namespace SC_CRM_API.Repositorio
 
                 try
                 {
-                    spEscribeCliente = _crmDbContext.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_CRM_TratativasInsertar  " +
+                    spEscribeCliente = _crmDbContext.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_CRM_TratativasInsertar" +
                         $"'{datos.ID_Vendedor}', '{datos.Comentarios}', '{datos.Fecha}', {datos.ID_Vendedor};").AsEnumerable().FirstOrDefault();
 
                     escritura = true;

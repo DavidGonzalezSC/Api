@@ -28,7 +28,7 @@ namespace SC_CRM_API.Controllers
             var retorno = await _miscs.listadoSeguimientosSinPresupuesto(cadena, NDias);
             if(retorno.Count > 0)
             {
-                var listaDto =  retorno.Select(e => new {e.ID_Tratativa, e.Nombre, e.Comentarios, e.Fecha }).ToList();
+                var listaDto = retorno.Select(e => new { e.ID_Tratativa, e.Nombre, e.Comentarios, e.Fecha }).OrderByDescending(f => f.Fecha.Date).ToList();
                 return Ok(listaDto);
             }else
             {
@@ -44,22 +44,18 @@ namespace SC_CRM_API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var guardarDatos = await _miscs.guardarContactoSinPresupuestoNuevo(sucursal, tratativa);
-            return Ok(guardarDatos);
+            if(tratativa.ID_Tratativa > 0)
+            {
+                var guardarDatos = await _miscs.editarContactoSinPresupuestoNuevo(sucursal, tratativa);
+                return Ok(guardarDatos);
+
+            }else
+            {
+                var guardarDatos = await _miscs.guardarContactoSinPresupuestoNuevo(sucursal, tratativa);
+                return Ok(guardarDatos);
+
+            }
         }
-
-        [HttpPost("{sucursal}/sinPresupuesto/actualizar")]
-        public async Task<IActionResult> actualizarDatosTratativas([FromRoute] string sucursal, [FromBody] SeguimientoSinPresupuestoDto tratativa)
-        {
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            var guardarDatos = await _miscs.editarContactoSinPresupuestoNuevo(sucursal, tratativa);
-            return Ok(guardarDatos);
-        }
-
-
 
     }
 }
