@@ -226,7 +226,7 @@ namespace SC_CRM_API.Repositorio
 
 
                 pedido.Cabecera.Cuit = renglones.First().Cuit.Trim();
-                pedido.Cabecera.FechaDeEntrega = (DateTime)renglones.First().FechaDeEntrega;
+                pedido.Cabecera.FechaDeEntrega = (DateTime?)renglones.First().FechaDeEntrega;
                 pedido.Cabecera.LeyendaDeEntrega = renglones.First().LeyendaDeEntrega;
                 pedido.Cabecera.Comentarios = renglones.First().Comentarios;
                 pedido.Cabecera.Transporte = renglones.First().Transporte;
@@ -241,6 +241,30 @@ namespace SC_CRM_API.Repositorio
                 pedido.Cabecera.Entrega_Localidad = renglones.First().Entrega_Localidad;
                 pedido.Cabecera.Entrega_Provincia = renglones.First().Entrega_Provincia;
                 pedido.Cabecera.Entrega_Pais = renglones.First().Entrega_Pais;
+
+                //-- Agregados para Virtual
+                pedido.Cabecera.CA_Banco = renglones.First().CA_Banco;
+                pedido.Cabecera.CA_CodAutorizacion = renglones.First().CA_CodAutorizacion;
+                pedido.Cabecera.CA_CodRespuestaNPS = renglones.First().CA_CodRespuestaNPS;
+                pedido.Cabecera.CA_Cuotas = renglones.First().CA_Cuotas;
+                pedido.Cabecera.CA_DetallePago = renglones.First().CA_DetallePago;
+                pedido.Cabecera.CA_DocRecibida = renglones.First().CA_DocRecibida;
+                pedido.Cabecera.CA_Documentacion = renglones.First().CA_Documentacion;
+                pedido.Cabecera.CA_EstadoMagento = renglones.First().CA_EstadoMagento;
+                pedido.Cabecera.CA_EstadoVeraz = renglones.First().CA_EstadoVeraz;
+                pedido.Cabecera.CA_Gateway = renglones.First().CA_Gateway;
+                pedido.Cabecera.CA_IdMagento = renglones.First().CA_IdMagento;
+                pedido.Cabecera.CA_ImporteOriginal = renglones.First().CA_ImporteOriginal;
+                pedido.Cabecera.CA_MailEnviado = renglones.First().CA_MailEnviado;
+                pedido.Cabecera.CA_NPSMsgRespuesta = renglones.First().CA_NPSMsgRespuesta;
+                pedido.Cabecera.CA_NPSTransactionID = renglones.First().CA_NPSTransactionID;
+                pedido.Cabecera.CA_NroCupon = renglones.First().CA_NroCupon;
+                pedido.Cabecera.CA_NroLote = renglones.First().CA_NroLote;
+                pedido.Cabecera.CA_NroTarjeta = renglones.First().CA_NroTarjeta;
+                pedido.Cabecera.CA_OrdenMagento = renglones.First().CA_OrdenMagento;
+                pedido.Cabecera.CA_ScoreVeraz = renglones.First().CA_ScoreVeraz;
+                pedido.Cabecera.CA_Tarjeta = renglones.First().CA_Tarjeta;
+                pedido.Cabecera.CA_WowRepe = renglones.First().CA_WowRepe;
 
                 foreach (var item in renglones)
                 {

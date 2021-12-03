@@ -97,5 +97,73 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public int? MedidaEspecial_Largo { get; set; }
         [Column("Espesor_ME")]
         public int? MedidaEspecial_Espesor { get; set; }
+
+        //--Agregar para Virtual
+        [Column("CA_Banco")]
+        public string CA_Banco { get; set; }
+
+        [Column("CA_CodAutorizacion")]
+        public string CA_CodAutorizacion { get; set; }
+
+        [Column("CA_CodRespuestaNPS")]
+        public string CA_CodRespuestaNPS { get; set; }
+
+        [Column("CA_Cuotas")]
+        public string CA_Cuotas { get; set; }
+
+        [Column("CA_DetallePago")]
+        public string CA_DetallePago { get; set; }
+
+        [Column("CA_DocRecibida")]
+        public string CA_DocRecibida { get; set; }
+
+        [Column("CA_Documentacion")]
+        public string CA_Documentacion { get; set; }
+
+        [Column("CA_EstadoMagento")]
+        public string CA_EstadoMagento { get; set; }
+
+        [Column("CA_EstadoVeraz")]
+        public string CA_EstadoVeraz { get; set; }
+
+        [Column("CA_Gateway")]
+        public string CA_Gateway { get; set; }
+
+        [Column("CA_IdMagento")]
+        public int? CA_IdMagento { get; set; }
+        
+        [Column("CA_ImporteOriginal")]
+        public decimal? CA_ImporteOriginal { get; set; }
+
+        [Column("CA_MailEnviado")]
+        public string CA_MailEnviado { get; set; }
+        
+        [Column("CA_NPSMsgRespuesta")]
+        public string CA_NPSMsgRespuesta { get; set; }
+
+        [Column("CA_NPSTransactionID")]
+        public string CA_NPSTransactionID { get; set; }
+
+        [Column("CA_NroCupon")]
+        public string CA_NroCupon { get; set; }
+
+        [Column("CA_NroLote")]
+        public string CA_NroLote { get; set; }
+
+        [Column("CA_NroTarjeta")]
+        public string CA_NroTarjeta { get; set; }
+
+        [Column("CA_OrdenMagento")]
+        public string CA_OrdenMagento { get; set; }
+
+        [Column("CA_ScoreVeraz")]
+        public string CA_ScoreVeraz { get; set; }
+
+        [Column("CA_Tarjeta")]
+        public string CA_Tarjeta { get; set; }
+
+        [Column("CA_WowRepe")]
+        public string CA_WowRepe { get; set; }
+
     }
 }

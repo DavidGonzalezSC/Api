@@ -322,6 +322,19 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("CA_NPSMsgRespuesta")]															//[varchar](255) NULL,
         public string NpsMsgRespuesta { get; set; }
 
+        //-- Agregados por Virtual a todas las Entidades
+        [Column("CA_WowRepe")]                                                                  //[varchar] (25) NOT NULL,
+        public string CaWowRepe { get; set; }
+
+        [Column("CA_IdMagento")]                                                                //[int] NULL,
+        public int? CaIdMagento { get; set; }
+
+    	[Column("CA_Gateway")]                                                                            //[varchar] (50) NOT NULL,
+        public string CaGateway { get; set; }
+ 
+        [Column("CA_DetallePago")]                                                                        //[varchar] (300) NOT NULL,
+        public string CaDetalleDePago { get; set; }
+
         //[NotMapped]
         //public IEnumerable<string> CodigosValidados = new List<string>(); //utilizado para alojar los SP que se quieran puentear
 
@@ -529,6 +542,19 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
 
         [Column("CA_NPSMsgRespuesta")]															//[varchar](255) NULL,
         public string NpsMsgRespuesta { get; set; }
+
+        //-- Agregado Para virtual
+        [Column("CA_WowRepe")]                                                                  //[varchar] (25) NOT NULL,
+        public string CaWowRepe { get; set; }
+
+        [Column("CA_IdMagento")]                                                                //[int] NULL,
+        public int? CaIdMagento { get; set; }
+
+        [Column("CA_Gateway")]                                                                            //[varchar] (50) NOT NULL,
+        public string CaGateway { get; set; }
+
+        [Column("CA_DetallePago")]                                                                        //[varchar] (300) NOT NULL,
+        public string CaDetalleDePago { get; set; }
 
 
     }

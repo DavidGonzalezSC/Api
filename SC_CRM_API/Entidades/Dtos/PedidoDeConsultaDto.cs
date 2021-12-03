@@ -46,6 +46,30 @@ namespace SC_CRM_API.Entidades.Dtos
         public string Entrega_Provincia { get; set; }
         public string Entrega_Pais { get; set; }
 
+        //--Agregar para Virtual
+        public string CA_Banco { get; set; }
+        public string CA_CodAutorizacion { get; set; }
+        public string CA_CodRespuestaNPS { get; set; }
+        public string CA_Cuotas { get; set; }
+        public string CA_DetallePago { get; set; }
+        public string CA_DocRecibida { get; set; }
+        public string CA_Documentacion { get; set; }
+        public string CA_EstadoMagento { get; set; }
+        public string CA_EstadoVeraz { get; set; }
+        public string CA_Gateway { get; set; }
+        public int? CA_IdMagento { get; set; }
+        public decimal? CA_ImporteOriginal { get; set; }
+        public string CA_MailEnviado { get; set; }
+        public string CA_NPSMsgRespuesta { get; set; }
+        public string CA_NPSTransactionID { get; set; }
+        public string CA_NroCupon { get; set; }
+        public string CA_NroLote { get; set; }
+        public string CA_NroTarjeta { get; set; }
+        public string CA_OrdenMagento { get; set; }
+        public string CA_ScoreVeraz { get; set; }
+        public string CA_Tarjeta { get; set; }
+        public string CA_WowRepe { get; set; }
+
     }
 
     public class PedidoDtoDetalle
