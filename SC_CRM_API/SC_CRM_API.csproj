@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <StartupObject>SC_CRM_API.Program</StartupObject>
     <UserSecretsId>dad8881d-30e8-449b-967a-b74557a47b5d</UserSecretsId>
   </PropertyGroup>

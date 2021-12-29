@@ -323,5 +323,63 @@ namespace SC_CRM_API.Repositorio
 
             return pedido;
         }
+
+        public async Task<ClienteDeConsulta> buscarClientePorTango(string sucursal, string tango)
+        {
+            Sucursal contexto = await credencialesAsync(sucursal);
+
+            await using (var _crmDbContext = new CrmContexto(contexto))
+            {
+                return _crmDbContext.ClientesDeConsulta.Where(c => c.CodTango == tango.Trim()).FirstOrDefault();
+            }
+        }
+
+        public async Task<PresupuestoDevueltoDbDto> obtenerPresupuestoPorMagento(string sucursal, string magento)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+            PresupuestoDevueltoDbDto presupuesto = new PresupuestoDevueltoDbDto();
+
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                presupuesto.Presupuesto = _crmDbContext.PresupuestosParaConsulta.Where(i => i.OrdenMagento == magento.Trim()).FirstOrDefault();
+                presupuesto.Cliente = _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuesto.Presupuesto.IdCliente).FirstOrDefault();
+                presupuesto.DetallesDto = _crmDbContext.DetallesParaConsultaVista
+                    .Where(d => d.IdPresupuesto == presupuesto.Presupuesto.IdPresupuesto)
+                    .OrderBy(cul => cul.IdOrden)
+                    .ToList();
+                presupuesto.DireccionesDeEntrega = _crmDbContext.DireccionDeEntregaParaConsulta.Where(e => e.IdCliente == presupuesto.Cliente.IdCliente).ToList();
+
+            }
+
+            return presupuesto;
+        }
+
+        public async Task<PresupuestoDevueltoDbDto> obtenerPresupuestoPorPedido(string sucursal, string pedido)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+            PresupuestoDevueltoDbDto presupuesto = new PresupuestoDevueltoDbDto();
+
+            if (!pedido.StartsWith(" "))
+                pedido = " " + pedido;
+
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+
+                var IdPresupuesto = _crmDbContext.PresupuestosAPedidos.Where(ip => ip.Nro_Pedido == pedido).FirstOrDefault().Id_Presupuesto;
+
+                presupuesto.Presupuesto = _crmDbContext.PresupuestosParaConsulta.Where(i => i.IdPresupuesto == IdPresupuesto).FirstOrDefault();
+                presupuesto.Cliente = _crmDbContext.ClientesDeConsulta.Where(c => c.IdCliente == presupuesto.Presupuesto.IdCliente).FirstOrDefault();
+                presupuesto.DetallesDto = _crmDbContext.DetallesParaConsultaVista
+                    .Where(d => d.IdPresupuesto == presupuesto.Presupuesto.IdPresupuesto)
+                    .OrderBy(cul => cul.IdOrden)
+                    .ToList();
+                presupuesto.DireccionesDeEntrega = _crmDbContext.DireccionDeEntregaParaConsulta.Where(e => e.IdCliente == presupuesto.Cliente.IdCliente).ToList();
+
+            }
+
+            return presupuesto;
+        }
     }
 }

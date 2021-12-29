@@ -42,6 +42,7 @@ namespace SC_CRM_API.Contextos
             modelBuilder.Entity<PresupuestoPasadosAPedido>().HasNoKey();
             modelBuilder.Entity<PedidoDetalle>().HasNoKey();
 
+
         }
 
         //--Mixtos

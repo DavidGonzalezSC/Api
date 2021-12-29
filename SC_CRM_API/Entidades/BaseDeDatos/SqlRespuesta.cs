@@ -31,4 +31,9 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string Resultado { get; set; }
     }
 
+    public class SqlRespuestaEscribirRemito
+    {
+        public string nro_remito { get; set; }
+    }
+
 }

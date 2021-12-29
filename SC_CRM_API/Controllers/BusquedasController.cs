@@ -44,6 +44,16 @@ namespace SC_CRM_API.Controllers
 
         }
 
+        [HttpGet("{sucursal}/clienteporcodigoTango/{tango}")] //--LISTO
+        public async Task<IActionResult> clientePorTango([FromRoute] string sucursal, [FromRoute] string tango)
+        {
+            var clientePorCuit = await _consultas.buscarClientePorTango(sucursal, tango);
+            return Ok(clientePorCuit);
+
+        }
+
+
+
         [HttpGet("{sucursal}/clientePorNombre/{razonSocial}")] //--LISTO
         public async Task<IActionResult> clientePorRazonSocial([FromRoute] string sucursal, [FromRoute] string razonSocial)
         {
@@ -56,6 +66,8 @@ namespace SC_CRM_API.Controllers
             return Ok(clientePorNombre);
 
         }
+
+
 
         [HttpGet("{sucursal}/listaclientesPorNombre/{busqueda}")] //--LISTO
         public async Task<IActionResult> listadoclientePorRazonSocial([FromRoute] string sucursal, [FromRoute] string busqueda)
@@ -137,6 +149,31 @@ namespace SC_CRM_API.Controllers
 
         }
 
+        //-- endpoiunt que traiga el presupedido segun magento
+        [HttpGet("{sucursal}/presupuestoPorMagento/{IdMagento}")]
+        public async Task<IActionResult> obtenerPresupuestoPorMagento([FromRoute] string sucursal, [FromRoute] string IdMagento)
+        {
+            var presupuesto = await _consultas.obtenerPresupuestoPorMagento(sucursal, IdMagento);
+            if (presupuesto != null)
+                return Ok(presupuesto);
+            else
+                return NotFound();
+
+        }
+
+        //-- endpoiunt que traiga segun pedido
+        [HttpGet("{sucursal}/presupuestoPorPedido/{NroPedido}")]
+        public async Task<IActionResult> obtenerPresupuestoPorPedido([FromRoute] string sucursal, [FromRoute] string NroPedido)
+        {
+            var presupuesto = await _consultas.obtenerPresupuestoPorPedido(sucursal, NroPedido);
+            if (presupuesto != null)
+                return Ok(presupuesto);
+            else
+                return NotFound();
+
+        }
+
+
         [HttpGet("{sucursal}/presupuestocabecera/{IdPresupuesto}")]
         public async Task<IActionResult> obtenerCabecera([FromRoute] string sucursal, [FromRoute] string IdPresupuesto)
         {
@@ -179,6 +216,7 @@ namespace SC_CRM_API.Controllers
 
 
         //--Presupuestos va en otro controlador por separado
+
 
 
     }

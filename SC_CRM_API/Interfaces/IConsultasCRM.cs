@@ -14,6 +14,7 @@ namespace SC_CRM_API.Interfaces
         Task<bool> clienteExisteAsync(string sucursal, string cuit);        //listo
         Task<ClienteDeConsulta> buscarClientePorCuitAsync(string sucursal, string cuit);        //listo
         Task<ClienteDeConsulta> buscarClientePorId(string sucursal, string Id);        //listo
+        Task<ClienteDeConsulta> buscarClientePorTango(string sucursal, string tango);
         Task<ClienteDeConsulta> buscarClientePorRazonSocialAsync(string sucursal, string RazonSocial); //--listo
         Task<IEnumerable<ClienteDeConsulta>> buscarClientePorRazonSocialTodosAsync(string sucursal, string cadenaDeBusqueda); //--Listo
         Task<IEnumerable<ClienteDeConsulta>> buscarClientePorRazonSocialQueComienzanConAsync(string sucursal, string cadenaDeBusqueda); //--Listo
@@ -26,6 +27,8 @@ namespace SC_CRM_API.Interfaces
         Task<List<DetallesEnTabla>> buscarDetallesPorPresupuesto(string sucursal, string idPresupuesto);
         Task<List<DetallesConVista>> buscarDetallesPorPresupuestoVista(string sucursal, string idPresupuesto);
         Task<PresupuestoDevueltoDbDto> obtenerPresupuesto(string sucursal, string IdPresupuesto);
+        Task<PresupuestoDevueltoDbDto> obtenerPresupuestoPorMagento(string sucursal, string magento);
+        Task<PresupuestoDevueltoDbDto> obtenerPresupuestoPorPedido(string sucursal, string pedido);
         //-- Todo: PRESUPUESTO POR NUMERO
 
 
