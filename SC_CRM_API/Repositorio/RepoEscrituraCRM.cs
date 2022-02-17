@@ -308,6 +308,7 @@ namespace SC_CRM_API.Repositorio
                                     List<string> pedidosOk = new List<string>();
                                     pedidosOk.Add(escritoPresupuesto.Comprobante);
                                     transac.ListaDePedidos.Add(pedidosOk);
+                                    transac.Prersu_Id = escritoPresupuesto.Comprobante.Trim(); //utilizado para vaalidar
                                     transac.PresupuestoSave = true;
                                     transac.EscrituraExitosa = true;
 
@@ -671,7 +672,21 @@ namespace SC_CRM_API.Repositorio
                 foreach (var item in reglasEnUso.ListaSpConsulta)
                 {
                     respuesta = contexto.Set<SqlRespuestaPlana>().FromSqlRaw(
-                        $"EXECUTE dbo.{item.Nombre} '{transac.Presupuesto.IdPresupuesto}', '{transac.IdGlobal}';").AsEnumerable().FirstOrDefault();
+                        $"EXECUTE dbo.{item.Nombre} '{transac.Prersu_Id}', '{transac.IdGlobal}';").AsEnumerable().FirstOrDefault();
+                    //$"EXECUTE dbo.{item.Nombre} '{transac.Presupuesto.IdPresupuesto}', '{transac.IdGlobal}';").AsEnumerable().FirstOrDefault();
+
+                    if (!respuesta.Resultado.Contains("OK"))
+                    {
+                        validacionesRealizadas.ListaDeErrores.Add(respuesta.Resultado);
+                        //validacionesRealizadas.PedidoValido = false; //descomentar cuando la validacion de stock local se haga efectiva
+                    }
+
+                }
+
+                foreach (var item in reglasEnUso.ListaSpBloqueantes)
+                {
+                    respuesta = contexto.Set<SqlRespuestaPlana>().FromSqlRaw(
+                        $"EXECUTE dbo.{item.Nombre} '{transac.Prersu_Id}', '{transac.IdGlobal}';").AsEnumerable().FirstOrDefault();
 
                     if (!respuesta.Resultado.Contains("OK"))
                     {

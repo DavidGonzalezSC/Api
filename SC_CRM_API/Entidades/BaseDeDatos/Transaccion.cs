@@ -28,6 +28,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public bool DomicEntregaSave { get; set; }
         public bool EscrituraExitosa { get; set; }
         public bool TangoSave { get; set; }
+        public string Prersu_Id { get; set; }
         public List<string> ListaDeErrores { get; set; } = new List<string>();
         public List<List<string>> ListaDePedidos { get; set; } = new List<List<string>>();
         public Guid IdGlobal { get; private set; } = _guid;

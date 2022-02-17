@@ -139,7 +139,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public string Email { get; set; }
 
         [Column("ID_DIRECCION_ENTREGA")]					//[int] NULL,
-        public int IdDireccionEntrega { get; set; }
+        public int? IdDireccionEntrega { get; set; }
 
         [Column("Observaciones")]							//[varchar](8000) NOT NULL,
         public string Observaciones { get; set; }
@@ -184,6 +184,13 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public float Long { get; set; }
 
 
+        //--AGREGADAS 08/02/2022
+
+        [Column("TienePedido")]
+        public int? TienePedido { get; set; }
+
+        [Column("LinkGoogleMaps")]
+        public string LinkGoogleMaps { get; set; }
 
     }
 

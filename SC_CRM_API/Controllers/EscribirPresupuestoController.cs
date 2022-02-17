@@ -76,6 +76,8 @@ namespace SC_CRM_API.Controllers
 
         }
 
+
+
         [HttpPost("{cadena}/escribirPedido")] //--LISTO
         public async Task<IActionResult> escribirPedido([FromRoute] string cadena, [FromBody] TransaccionDto transaccDto)
         {
@@ -88,6 +90,9 @@ namespace SC_CRM_API.Controllers
                 return BadRequest(errores);
 
             }
+
+            //-- PARA PRUEBAS
+            //cadena = "TP";
 
             var transaccion = new Transaccion(cadena);
             transaccion.Cliente = transaccDto.Cliente;
