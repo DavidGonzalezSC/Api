@@ -33,6 +33,7 @@ namespace SC_CRM_API
             services.AddCors();
             services.AddDbContext<SucursalesDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("Productivo")));
             services.AddDbContext<MensajeriaDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("ServidorMail")));
+            services.AddDbContext<MagentoDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("TestMagento")));
             services.AddDbContext<MensajeriaDbContext>();
 
             services.AddScoped<IValidaciones, ReglasDeValidacion>();

@@ -11,9 +11,9 @@ namespace SC_CRM_API.Repositorio
 {
     public class RepoMagento : IMagento
     {
-        private readonly SucursalesDbContext _ordenesMagento;
+        private readonly MagentoDbContext _ordenesMagento;
 
-        public RepoMagento(SucursalesDbContext ordenes)
+        public RepoMagento(MagentoDbContext ordenes)
         {
             _ordenesMagento = ordenes;
         }

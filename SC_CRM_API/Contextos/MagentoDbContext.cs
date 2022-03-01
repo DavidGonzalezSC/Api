@@ -7,15 +7,14 @@ using System.Threading.Tasks;
 
 namespace SC_CRM_API.Contextos
 {
-    public class SucursalesDbContext : DbContext
+    public class MagentoDbContext : DbContext
     {
-        public DbSet<Sucursal> DbSetSucursales { get; set; }
+        public DbSet<EstatusMagento> DbMagentoStatus { get; set; }
 
         //Para actualizar estados
-        public SucursalesDbContext(DbContextOptions<SucursalesDbContext> opciones)
+        public MagentoDbContext(DbContextOptions<MagentoDbContext> opciones)
             : base(opciones)
         {
         }
-        
     }
 }
