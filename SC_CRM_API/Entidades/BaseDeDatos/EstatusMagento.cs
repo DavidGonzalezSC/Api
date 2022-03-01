@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SC_CRM_API.Entidades.BaseDeDatos
 {
+    [Table("WS_MagentoOrdenes")]
     public class EstatusMagento
     {
         [Key]
