@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SC_CRM_API.Contextos;
 using SC_CRM_API.Helpers.Validaciones;
+using SC_CRM_API.Hubs;
 using SC_CRM_API.Interfaces;
 using SC_CRM_API.Repositorio;
 using System;
@@ -30,10 +31,20 @@ namespace SC_CRM_API
         public void ConfigureServices(IServiceCollection services)
         {
             //agregar cors
-            services.AddCors();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("PoliticaCORSdeAPIPEDIDOS", builder => builder
+                        .SetIsOriginAllowed(_ => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+                
+            });
+
             services.AddDbContext<SucursalesDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("Productivo")));
             services.AddDbContext<MensajeriaDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("ServidorMail")));
-            services.AddDbContext<MagentoDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("TestMagento")));
+            services.AddDbContext<MagentoDbContext>(opciones => opciones.UseSqlServer(Configuration.GetConnectionString("Productivo")));
             services.AddDbContext<MensajeriaDbContext>();
 
             services.AddScoped<IValidaciones, ReglasDeValidacion>();
@@ -44,6 +55,12 @@ namespace SC_CRM_API
             services.AddScoped<IMensajeria, RepoMensajeria>();
             services.AddScoped<IMiscelaneos, RepoMiscelaneo>();
             services.AddScoped<IMagento, RepoMagento>();
+
+            //--SignalR
+            services.AddSignalR();
+
+
+
             services.AddControllers();
         }
 
@@ -55,7 +72,7 @@ namespace SC_CRM_API
             app.UseRouting();
 
             //OJALDRE ACA ------------ DANGER!!! ---------------- BUN
-            app.UseCors(regla => regla.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin());
+            app.UseCors("PoliticaCORSdeAPIPEDIDOS");
             //OJALDRE ACA ------------ DANGER!!! ---------------- BUN
 
             app.UseAuthorization();
@@ -65,6 +82,7 @@ namespace SC_CRM_API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<HubMagento>("magento/estatus");
             });
 
 

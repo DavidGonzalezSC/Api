@@ -8,11 +8,19 @@ namespace SC_CRM_API.Interfaces
 {
     public interface IMagento
     {
-        //-- Lectura de estatus
-        Task<List<EstatusMagento>> OrdenesSinProcesar();
-        Task<List<EstatusMagento>> OrdenesDeUltimas24Horas();
-        Task<List<EstatusMagento>> OrdenesCanceladas();
-        Task<List<EstatusMagento>> OrdenesProcessing();
+        //-- Lectura de estatus v1 medio obsoletos
+        Task<List<EstatusMagentoV1>> OrdenesSinProcesarV1();
+        Task<List<EstatusMagentoV1>> OrdenesDeUltimas24HorasV1();
+        Task<List<EstatusMagentoV1>> OrdenesCanceladasV1();
+        Task<List<EstatusMagentoV1>> OrdenesProcessingV1();
+
+        Task<int> EscribirOrdenV1(EstatusMagentoV1 magento);
+
+        //-- Lectura de status con V2
+        Task<List<EstatusMagentoV2>> OrdenesSinProcesarV2();
+
+        //-- Ir a buscar datos de la transaccion
+        Task<int> ObtenerDatosExternos(string numeroDeOrden);
 
 
     }

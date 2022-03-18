@@ -9,7 +9,8 @@ namespace SC_CRM_API.Contextos
 {
     public class MagentoDbContext : DbContext
     {
-        public DbSet<EstatusMagento> DbMagentoStatus { get; set; }
+        public DbSet<EstatusMagentoV1> DbMagentoStatusV1 { get; set; }
+        public DbSet<EstatusMagentoV2> DbMagentoStatusV2 { get; set; }
 
         //Para actualizar estados
         public MagentoDbContext(DbContextOptions<MagentoDbContext> opciones)
