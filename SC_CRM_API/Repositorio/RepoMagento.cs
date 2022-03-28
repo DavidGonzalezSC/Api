@@ -55,6 +55,8 @@ namespace SC_CRM_API.Repositorio
             return listado;
         }
 
+
+
         public Task<List<EstatusMagentoV1>> OrdenesProcessingV1()
         {
             throw new NotImplementedException();
@@ -73,6 +75,13 @@ namespace SC_CRM_API.Repositorio
             return listado;
         }
 
+        public async Task<List<EstatusMagentoV2>> OrdenesDeUltimas24HorasV2()
+        {
+            var listado = await _ordenesMagento.DbMagentoStatusV2
+                .Where(f => f.AudIngresado.AddDays(1) >= DateTime.Now)
+                .OrderByDescending(a => a.AudIngresado).ToListAsync();
+            return listado;
+        }
 
         //--Ejecutar un comando??
         static int RecolectarDatosDeOrdenesAsync(string orden, string estatus)
@@ -118,7 +127,7 @@ namespace SC_CRM_API.Repositorio
 
             foreach (var item in ordenAProcesar)
             {
-                if (item.Preprocesado == null || false)
+                if (item.Preprocesado == null || item.Preprocesado == false)
                 {
                     cuentaProcesados += RecolectarDatosDeOrdenesAsync(item.NroOrden, item.Estado);
                 }

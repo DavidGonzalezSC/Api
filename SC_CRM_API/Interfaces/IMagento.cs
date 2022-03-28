@@ -18,6 +18,7 @@ namespace SC_CRM_API.Interfaces
 
         //-- Lectura de status con V2
         Task<List<EstatusMagentoV2>> OrdenesSinProcesarV2();
+        Task<List<EstatusMagentoV2>> OrdenesDeUltimas24HorasV2();
 
         //-- Ir a buscar datos de la transaccion
         Task<int> ObtenerDatosExternos(string numeroDeOrden);

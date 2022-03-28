@@ -45,6 +45,16 @@ namespace SC_CRM_API.Controllers
 
         }
 
+        [HttpGet("ultimas24hV2")] //--LISTO
+        public async Task<IActionResult> ordenesUltimas24hV2()
+        {
+            //Descontinuar cuando V2 entre a implementar
+            var listado = await _magento.OrdenesDeUltimas24HorasV2();
+            await _hubContext.Clients.All.SendAsync("ultimas24hv2", listado);
+            return Ok(); //
+
+        }
+
 
         [HttpGet("sinProcesoV2")] //--LISTO
         public async Task<IActionResult> ordenesSinProcesoV2()
