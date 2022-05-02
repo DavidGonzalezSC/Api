@@ -125,6 +125,7 @@ namespace SC_CRM_API.Controllers
 
         }
 
+
         //--Busquedas de Renglones de Detalles
         [HttpGet("{sucursal}/renglonesDelpresupuesto/{IdPresupuesto}")] //--
         public async Task<IActionResult> renglonesDelPresupuesto([FromRoute] string sucursal, [FromRoute] string IdPresupuesto)

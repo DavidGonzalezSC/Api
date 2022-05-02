@@ -248,7 +248,7 @@ namespace SC_CRM_API.Repositorio
 
                             if (string.IsNullOrEmpty(listaDeEscritoDomicilio.First().Comprobante))
                             {
-                                transac.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: BUN");
+                                transac.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: DOMICILIOS");
                                 transac.EscrituraExitosa = false;
                                 transaccion.Rollback();
                                 transaccion.Dispose();
