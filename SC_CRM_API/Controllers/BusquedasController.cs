@@ -215,6 +215,20 @@ namespace SC_CRM_API.Controllers
         }
 
 
+        [HttpGet("{sucursal}/historialMagento/{OrdenMagento}")]
+        public async Task<IActionResult> historialDelMagento([FromRoute] string sucursal, [FromRoute] string ordenMagento)
+        {
+            var listado = await _consultas.historialMagento(sucursal, ordenMagento);
+            return Ok(listado);
+        }
+
+        [HttpGet("{sucursal}/presupuestosMagento/{OrdenMagento}")]
+        public async Task<IActionResult> pedidosPorOrdenMagento([FromRoute] string sucursal, [FromRoute] string ordenMagento)
+        {
+            var listado = await _consultas.presupuestosMagento(sucursal, ordenMagento);
+            return Ok(listado);
+        }
+
 
         //--Presupuestos va en otro controlador por separado
 

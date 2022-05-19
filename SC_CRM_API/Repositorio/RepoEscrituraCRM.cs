@@ -231,7 +231,42 @@ namespace SC_CRM_API.Repositorio
                                 foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
                                 {
                                     direccion.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
-                                    direccion.Direccion = direccion.Calle.Trim() + " " + direccion.Numero.Trim() + " " + direccion.Piso.Trim() + " " + direccion.Depto.Trim();
+
+                                    string dire_temp = "";
+                                    string numero_temp = "";
+                                    string piso_temp = "";
+                                    string depto_temp = "";
+
+                                    if (!string.IsNullOrEmpty(direccion.Calle))
+                                        dire_temp = direccion.Calle.Trim();
+
+                                    if (!string.IsNullOrEmpty(direccion.Numero))
+                                    {
+                                        numero_temp = direccion.Numero.Trim();
+                                    }else
+                                    {
+                                        direccion.Numero = "";
+                                    }
+
+                                    if (!string.IsNullOrEmpty(direccion.Piso))
+                                    {
+                                        piso_temp = direccion.Piso.Trim();
+
+                                    }else
+                                    {
+                                        direccion.Piso = "";
+                                    }
+
+                                    if (!string.IsNullOrEmpty(direccion.Depto))
+                                    {
+                                        depto_temp = direccion.Depto.Trim();
+                                    }else
+                                    {
+                                        direccion.Depto = "";
+                                    }
+
+
+                                    direccion.Direccion = dire_temp + " " + numero_temp + " " + piso_temp + " " + depto_temp;
                                     contextoDeEscritura.DireccionDeEntregas.Add(direccion);
                                 }
 
@@ -317,18 +352,25 @@ namespace SC_CRM_API.Repositorio
                                     {
 
                                         //================ VALIDACIONES===============================
-                                        
-                                        var validaciones = new ValidacionesPedido();
-                                        validaciones = await validarPedido(transac, contextoDeEscritura);
 
-                                        if (!validaciones.PedidoValido) //el pedido no pasó las validaciones
+                                        //--Pregunto si la orden magento no existe..no valido magentos
+                                        if (string.IsNullOrEmpty(transac.Presupuesto.OrdenMagento))
                                         {
-                                            transac.EscrituraExitosa = false;
-                                            transac.ListaDeErrores.AddRange(validaciones.ListaDeErrores);
-                                            transaccion.Rollback();
-                                            transaccion.Dispose();
-                                            return transac;
+                                            var validaciones = new ValidacionesPedido();
+                                            validaciones = await validarPedido(transac, contextoDeEscritura);
+
+                                            if (!validaciones.PedidoValido) //el pedido no pasó las validaciones
+                                            {
+                                                transac.EscrituraExitosa = false;
+                                                transac.ListaDeErrores.AddRange(validaciones.ListaDeErrores);
+                                                transaccion.Rollback();
+                                                transaccion.Dispose();
+                                                return transac;
+                                            }
+
                                         }
+                                        
+                                        
 
                                         //================ VALIDACIONES===============================
 

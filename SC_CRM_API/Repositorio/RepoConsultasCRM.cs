@@ -381,5 +381,43 @@ namespace SC_CRM_API.Repositorio
 
             return presupuesto;
         }
+
+        public async Task<List<HistorialMagento>> historialMagento(string sucursal, string magento)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+            List<HistorialMagento> historial = new List<HistorialMagento>();
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                historial = await _crmDbContext.HistorialMagentos.Where(m => m.Orden == magento).ToListAsync();
+
+            }
+
+            return historial;
+        }
+
+        public async Task<List<HistorialMagento>> presupuestosMagento(string sucursal, string magento)
+        {
+            Sucursal credenciales = await credencialesAsync(sucursal);
+            List<HistorialMagento> historial = new List<HistorialMagento>();
+            List<PresupuestoDeConsulta> presus = new List<PresupuestoDeConsulta>();
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                presus = await _crmDbContext.PresupuestosParaConsulta.Where(m => m.OrdenMagento == magento).ToListAsync();
+
+            }
+
+            foreach (var item in presus)
+            {
+                HistorialMagento tempo = new HistorialMagento();
+                tempo.Orden = item.OrdenMagento;
+                tempo.Presupuesto = item.IdPresupuesto;
+                tempo.Documentacion = item.Documentacion;
+                historial.Add(tempo);
+            }
+
+            return historial;
+        }
     }
 }

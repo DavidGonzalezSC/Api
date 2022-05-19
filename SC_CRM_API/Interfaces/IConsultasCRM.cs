@@ -37,11 +37,14 @@ namespace SC_CRM_API.Interfaces
         Task<PedidoDeConsultaDto> buscarPedido(string sucursal, Int16 Talonario, string NroDePedido);
         Task<PedidoDetalle> buscarPedidoConDetalle(string sucursal, Int16 Talonario, string NroDePedido);
         Task<IEnumerable<PresupuestoPasadosAPedido>> listadoPresupuestoPasadosAPedido(string sucursal, string nroPedido);
-       // pedidos por presu
-         //   pedidos por cliente
+        // pedidos por presu
+        //   pedidos por cliente
 
 
 
+        //--Misc
+        Task<List<HistorialMagento>> historialMagento(string sucursal, string magento);
+        Task<List<HistorialMagento>> presupuestosMagento(string sucursal, string magento);
 
 
 

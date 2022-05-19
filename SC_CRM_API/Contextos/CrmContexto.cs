@@ -40,6 +40,7 @@ namespace SC_CRM_API.Contextos
             modelBuilder.Entity<PedidoDeConsulta>().HasNoKey();
             modelBuilder.Entity<DetallesConVista>().HasNoKey();
             modelBuilder.Entity<PresupuestoPasadosAPedido>().HasNoKey();
+            modelBuilder.Entity<HistorialMagento>().HasNoKey();
             modelBuilder.Entity<PedidoDetalle>().HasNoKey();
 
 
@@ -67,6 +68,7 @@ namespace SC_CRM_API.Contextos
         public DbSet <PedidoDeConsulta> PedidosParaConsulta { get; set; }
         public DbSet<PresupuestoPasadosAPedido> PresupuestosAPedidos { get; set; }
         public DbSet<PedidoDetalle> DetallesPedidos { get; set; }
+        public DbSet<HistorialMagento> HistorialMagentos { get; set; }
 
 
     }
