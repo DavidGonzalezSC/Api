@@ -201,10 +201,11 @@ namespace SC_CRM_API.Repositorio
                         //--Agregar la lista de precios al cliente antes de escribirlo
                         transac.Cliente.ListaDePrecios = transac.Detalles.First().CodigoListaPrecio.Value;
 
+                        //--VALIDAR CLIENTE ANTES DE ESCRIBIR--
+                        transac.Cliente = validarCliente(transac.Cliente);
 
 
                         contextoDeEscritura.Clientes.Add(transac.Cliente);
-
                         salidaCliente = contextoDeEscritura.SaveChanges();
                         //--SP de Cliente
                         var escritoCliente = EscribirClienteSP(transac.IdGlobal, contextoDeEscritura);
@@ -305,6 +306,9 @@ namespace SC_CRM_API.Repositorio
                                 transac.Presupuesto.IdDeSucursal = Convert.ToInt32(listaDeEscritoDomicilio.First().Comprobante); //paso el dato del cliente
                                 transac.Presupuesto.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato del cliente
 
+                                //--VALIDAR Presupuesto ANTES DE ESCRIBIR--
+                                transac.Presupuesto = validarCabecera(transac.Presupuesto);
+
                                 contextoDeEscritura.Presupuestos.Add(transac.Presupuesto);
                                 salidaCliente = contextoDeEscritura.SaveChanges();
 
@@ -326,6 +330,8 @@ namespace SC_CRM_API.Repositorio
                                     contextoDeEscritura.Detalles.Add(detalle);
 
                                 }
+
+                              
 
                                 salidaCliente = contextoDeEscritura.SaveChanges();
 
@@ -369,9 +375,6 @@ namespace SC_CRM_API.Repositorio
                                             }
 
                                         }
-                                        
-                                        
-
                                         //================ VALIDACIONES===============================
 
                                         var listadoDeTango = EscribirEnTango(transac.IdGlobal, contextoDeEscritura);
@@ -637,6 +640,62 @@ namespace SC_CRM_API.Repositorio
 
         }
 
+        public async Task<IEnumerable<SqlRespuesta>> EscribirEnNexoSPAsync(List<NexoEscrituraDTO> listadoaFacturar)
+        {
+
+            Sucursal sucursal = await credencialesAsync(listadoaFacturar.First().CodigoSucursal);
+
+            List<SqlRespuesta> respuestas = new List<SqlRespuesta>();
+            var spEscribeCliente = new SqlRespuesta();
+
+            try
+            {
+                await using (var contextoDeEscritura = new CrmContexto(sucursal))
+                {
+                    foreach (var item in listadoaFacturar)
+                    {
+
+
+                        string query = $"exec SP_TIENDA_NEXO_Magento_Ceravolo_V1 '{item.nroPedido}', {item.talonPed}, '{item.OrdenMagento}', '{item.nroTransaccion}', {item.id_sba22}, {item.cantidadCuotas}, {item.id_sba21};";
+                        var execrespuesta = await contextoDeEscritura.Database.ExecuteSqlRawAsync(query);
+
+                        spEscribeCliente = new SqlRespuesta
+                        {
+                            Resultado = execrespuesta.ToString(),
+                            Comprobante = "",
+                            Fecha = DateTime.Now,
+                            Error_Mensaje = "Bien",
+                            Error_Severidad = "0",
+                            Error_Estado = "0"
+                        };
+
+                        respuestas.Add(spEscribeCliente);
+
+                    }
+
+
+                }
+
+            }
+            catch (Exception error)
+            {
+                spEscribeCliente = new SqlRespuesta
+                {
+                    Resultado = "Catch",
+                    Comprobante = "",
+                    Fecha = DateTime.Now,
+                    Error_Mensaje = error.Message,
+                    Error_Severidad = "0",
+                    Error_Estado = "0"
+                };
+
+                respuestas.Add(spEscribeCliente);
+            }
+
+            return respuestas;
+
+        }
+
         private SqlRespuesta EscribirPresupuestoSP(Guid guid, CrmContexto crmContexto)
         {
             var spEscribeCliente = new SqlRespuesta();
@@ -822,43 +881,31 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-        //--------------- No utilizadas -------------------------------
 
-        public async Task<IEnumerable<string>> validarCabecera(Presupuesto presupuesto)
+        public Cliente validarCliente(Cliente cliente)
         {
-            ValidarPresupuesto validarcabecera = new ValidarPresupuesto();
-            ValidationResult resultado = await validarcabecera.ValidateAsync(presupuesto);
-            List<string> errores = new List<string>();
+            if (cliente.NombreCorto.Length > 20)
+                cliente.NombreCorto = cliente.NombreCorto.Substring(0, 19);
 
-            if (!resultado.IsValid)
-            {
-                foreach (var error in resultado.Errors)
-                {
-                    string mensaje = "Falló la validación de Cabecera en: " + error.PropertyName + " - Error: " + error.ErrorMessage;
-                    errores.Add(mensaje);
-                }
-            }
+            if (cliente.Domicilio.Length > 50)
+                cliente.Domicilio = cliente.Domicilio.Substring(0, 49);
+            if (cliente.DomicilioCalle.Length > 50)
+                cliente.DomicilioCalle = cliente.DomicilioCalle.Substring(0, 49);
+            if (cliente.DomicilioComercialCalle.Length > 50)
+                cliente.DomicilioComercialCalle = cliente.DomicilioComercialCalle.Substring(0, 49);
 
-            return errores;
+            return cliente;
+        }
+        
+
+        public Presupuesto validarCabecera(Presupuesto presupuesto)
+        {
+            if (presupuesto.Banco.Length > 25)
+                presupuesto.Banco = presupuesto.Banco.Substring(0, 24);
+
+            return presupuesto;
         }
 
-        public async Task<IEnumerable<string>> validarCliente(Cliente cliente)
-        {
-            ValidarCliente validarcliente = new ValidarCliente();
-            ValidationResult resultado = await validarcliente.ValidateAsync(cliente);
-            List<string> errores = new List<string>();
-
-            if (!resultado.IsValid)
-            {
-                foreach (var error in resultado.Errors)
-                {
-                    string mensaje = "Falló la validación de Cliente en: " + error.PropertyName + " - Error: " + error.ErrorMessage;
-                    errores.Add(mensaje);
-                }
-            }
-
-            return errores;
-        }
         
         public async Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direcciones)
         {
@@ -881,12 +928,6 @@ namespace SC_CRM_API.Repositorio
         public async Task<IEnumerable<string>> validarTransaccion(Transaccion transaccion)
         {
             List<string> ListadoDeErrores = new List<string>();
-
-            var erroresCliente = await validarCliente(transaccion.Cliente);
-            ListadoDeErrores.AddRange(erroresCliente);
-
-            var erroresCabecera = await validarCabecera(transaccion.Presupuesto);
-            ListadoDeErrores.AddRange(erroresCabecera);
 
             foreach (Detalle item in transaccion.Detalles)
             {

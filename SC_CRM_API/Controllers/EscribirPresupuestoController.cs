@@ -22,20 +22,14 @@ namespace SC_CRM_API.Controllers
 
 
         [HttpPost("{cadena}/validarCliente")] //--LISTO
-        public async Task<IActionResult> validarCliente([FromRoute] string cadena, [FromBody] ClienteDto cliente)
+        public IActionResult validarCliente([FromRoute] string cadena, [FromBody] ClienteDto cliente)
         {
-            var verificarCliente = await _escritura.validarCliente(cliente);
+            var verificarCliente = _escritura.validarCliente(cliente);
             return Ok(verificarCliente);
 
         }
 
-        [HttpPost("{cadena}/validarCabecera")] //--LISTO
-        public async Task<IActionResult> validarCabecera([FromRoute] string cadena, [FromBody] PresupuestoDto cabecera)
-        {
-            var verificarCabecera = await _escritura.validarCabecera(cabecera);
-            return Ok(verificarCabecera);
-
-        }
+      
 
         [HttpPost("{cadena}/validarDetalle")] //--LISTO
         public async Task<IActionResult> validarRenglon([FromRoute] string cadena, [FromBody] DetalleDto detalle)
@@ -76,6 +70,13 @@ namespace SC_CRM_API.Controllers
 
         }
 
+
+        [HttpPost("{cadena}/escribirNexo")] //--LISTO
+        public async Task<IActionResult> escribirEnNexo([FromRoute] string cadena, [FromBody] List<NexoEscrituraDTO> listaAescribir)
+        {
+            var verificarTransaccion = await _escritura.EscribirEnNexoSPAsync(listaAescribir);
+            return Ok(verificarTransaccion);
+        }
 
 
         [HttpPost("{cadena}/escribirPedido")] //--LISTO
