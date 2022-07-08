@@ -33,6 +33,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         public Guid IdEvento { get; set; }
 
         public int Creacion { get; set; }
+        
 
     }
 
@@ -192,6 +193,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
         [Column("LinkGoogleMaps")]
         public string LinkGoogleMaps { get; set; }
 
+        public bool Escaleras { get; set; }
     }
 
 

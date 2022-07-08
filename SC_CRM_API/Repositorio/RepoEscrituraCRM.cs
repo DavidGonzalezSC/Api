@@ -229,8 +229,10 @@ namespace SC_CRM_API.Repositorio
 
                             if (transac.DireccionesDeEntrega.Count > 0)
                             {
+
                                 foreach (DireccionDeEntrega direccion in transac.DireccionesDeEntrega)
                                 {
+
                                     direccion.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato devuelto por el SP
 
                                     string dire_temp = "";
@@ -246,6 +248,7 @@ namespace SC_CRM_API.Repositorio
                                         numero_temp = direccion.Numero.Trim();
                                     }else
                                     {
+                                        
                                         direccion.Numero = "";
                                     }
 
@@ -266,9 +269,14 @@ namespace SC_CRM_API.Repositorio
                                         direccion.Depto = "";
                                     }
 
+                                    direccion.Escaleras = false;
 
                                     direccion.Direccion = dire_temp + " " + numero_temp + " " + piso_temp + " " + depto_temp;
-                                    contextoDeEscritura.DireccionDeEntregas.Add(direccion);
+                                    direccion.Direccion = direccion.Direccion.Trim();
+
+                                    var direccionValidada = validarDomicilio(direccion);
+                                    contextoDeEscritura.DireccionDeEntregas.Add(direccionValidada);
+
                                 }
 
                                 salidaCliente = contextoDeEscritura.SaveChanges();
@@ -590,8 +598,6 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-
-        
         private string AnularPedidoSP(string Pedido, Int16 Talonario, CrmContexto crmContexto)
         {
             var respuesta = new SqlRespuestaPlana();
@@ -907,6 +913,20 @@ namespace SC_CRM_API.Repositorio
         }
 
         
+        public DireccionDeEntrega validarDomicilio(DireccionDeEntrega domicilio)
+        {
+
+            //--validaciones de domicilio
+            if (domicilio.Direccion.Length > 50)
+                domicilio.Direccion = domicilio.Direccion.Substring(0, 49);
+
+            if (domicilio.Calle.Length > 50)
+                domicilio.Calle = domicilio.Calle.Substring(0, 49);
+
+
+            return domicilio;
+        }
+
         public async Task<IEnumerable<string>> validarDomicDeEntrega(DireccionDeEntrega direcciones)
         {
             ValidarDireccionDeEntrega validarDireccion = new ValidarDireccionDeEntrega();
