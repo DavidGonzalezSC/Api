@@ -230,9 +230,45 @@ namespace SC_CRM_API.Controllers
         }
 
 
-        //--Presupuestos va en otro controlador por separado
+        //--Busquedas de MELI
+        [HttpGet("MELI/SinProcesar")]
+        public async Task<IActionResult> MeliSinProceso()
+        {
+            var listado = await _consultas.ObtenerMelisNoProcesados();
+            return Ok(listado);
+        }
 
+        [HttpGet("MELI/ListaVigente")]
+        public async Task<IActionResult> listaMeliVigente()
+        {
+            var listado = await _consultas.ListaDePreciosVigente();
+            return Ok(listado);
+        }
 
+        [HttpGet("MELI/StockMeli")]
+        public async Task<IActionResult> StockMeli()
+        {
+            var listado = await _consultas.StockPorDepo();
+            return Ok(listado);
+        }
+
+        [HttpGet("MELI/Proveedores")]
+        public async Task<IActionResult> Proveedores()
+        {
+            var listado = await _consultas.ProveedorPorArticulo();
+            return Ok(listado);
+        }
+
+        [HttpGet("MELI/VerificaProcesado/{orden}")]
+        public async Task<IActionResult> VerificarPasado([FromRoute] string orden)
+        {
+            var presupuesto = await _consultas.obtenerPresupuestoPorMagento("SV", orden);
+
+            if (presupuesto != null)
+                return Ok(true);
+            else
+                return NotFound();
+        }
 
     }
 }

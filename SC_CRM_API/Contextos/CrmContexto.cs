@@ -42,6 +42,8 @@ namespace SC_CRM_API.Contextos
             modelBuilder.Entity<PresupuestoPasadosAPedido>().HasNoKey();
             modelBuilder.Entity<HistorialMagento>().HasNoKey();
             modelBuilder.Entity<PedidoDetalle>().HasNoKey();
+            modelBuilder.Entity<MeliStock>().HasNoKey();
+            modelBuilder.Entity<ProveedorArtSimple>().HasNoKey();
 
 
         }
@@ -69,6 +71,11 @@ namespace SC_CRM_API.Contextos
         public DbSet<PresupuestoPasadosAPedido> PresupuestosAPedidos { get; set; }
         public DbSet<PedidoDetalle> DetallesPedidos { get; set; }
         public DbSet<HistorialMagento> HistorialMagentos { get; set; }
+
+        //--MELI
+        public DbSet<ListaDePreciosMeli> listaDePrecios { get; set; }
+        public DbSet<MeliStock> stockMeli { get; set; }
+        public DbSet<ProveedorArtSimple> ProveedorPorArticulo { get; set; }
 
 
     }

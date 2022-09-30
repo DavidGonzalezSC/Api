@@ -14,13 +14,13 @@ namespace SC_CRM_API.Repositorio
     public class RepoConsultasCRM : IConsultasCRM
     {
 
+        private readonly AuxiliarContexto _MeliContexto;
         private readonly IServiciosSucursales _sucursales;
 
-        public RepoConsultasCRM(IServiciosSucursales sucursales)
+        public RepoConsultasCRM(IServiciosSucursales sucursales, AuxiliarContexto meliContexto)
         {
             _sucursales = sucursales;
-
-
+            _MeliContexto = meliContexto;
         }
 
         public async Task<Sucursal> credencialesAsync(string sucursal)
@@ -419,5 +419,65 @@ namespace SC_CRM_API.Repositorio
 
             return historial;
         }
+
+        public async Task<List<Meli_Auxiliar_V2>> ObtenerMelisNoProcesados()
+        {
+            var listado = new List<Meli_Auxiliar_V2>();
+            listado = await _MeliContexto.DbMeliV2.Where(p => p.Procesado == "N").ToListAsync();
+            return listado;
+        }
+
+        public async Task<Meli_Auxiliar_V2> ObtenerMeliPorOrden(string orden)
+        {
+            var registro = new Meli_Auxiliar_V2();
+            registro = await _MeliContexto.DbMeliV2.Where(i => i.IdOrdenMeli == orden).FirstAsync();
+            return registro;
+        }
+
+        public async Task<int> ActualizarMeli(Meli_Auxiliar_V2 meli)
+        {
+            var busqueda = await _MeliContexto.DbMeliV2.Where(i => i.idInterno == meli.idInterno).FirstAsync();
+            busqueda = meli;
+            var resultado = await _MeliContexto.SaveChangesAsync();
+            return resultado;
+        }
+
+        public async Task<List<ListaDePreciosMeli>> ListaDePreciosVigente()
+        {
+            Sucursal credenciales = await credencialesAsync("SV");
+            List<ListaDePreciosMeli> listaVigente = new List<ListaDePreciosMeli>();
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                listaVigente = await _crmDbContext.listaDePrecios.Where(n => n.Nombre_Lis.Contains("Meli")).Where(h => h.Habilitada).ToListAsync();
+
+            }
+            return listaVigente;
+        }
+
+        public async Task<List<MeliStock>> StockPorDepo()
+        {
+            Sucursal credenciales = await credencialesAsync("DI");
+            List<MeliStock> listaVigente = new List<MeliStock>();
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                listaVigente = await _crmDbContext.stockMeli.ToListAsync();
+            }
+            return listaVigente;
+        }
+
+        public async Task<List<ProveedorArtSimple>> ProveedorPorArticulo()
+        {
+            Sucursal credenciales = await credencialesAsync("TH");
+            List<ProveedorArtSimple> listaVigente = new List<ProveedorArtSimple>();
+
+            await using (var _crmDbContext = new CrmContexto(credenciales))
+            {
+                listaVigente = await _crmDbContext.ProveedorPorArticulo.ToListAsync();
+            }
+            return listaVigente;
+        }
+        
     }
 }

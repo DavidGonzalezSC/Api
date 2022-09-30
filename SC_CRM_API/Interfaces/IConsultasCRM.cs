@@ -47,6 +47,14 @@ namespace SC_CRM_API.Interfaces
         Task<List<HistorialMagento>> presupuestosMagento(string sucursal, string magento);
 
 
+        //--MELI
+        Task<List<Meli_Auxiliar_V2>> ObtenerMelisNoProcesados();
+        Task<Meli_Auxiliar_V2> ObtenerMeliPorOrden(string orden);
+        Task<int> ActualizarMeli(Meli_Auxiliar_V2 meli);
+        Task<List<ListaDePreciosMeli>> ListaDePreciosVigente();
+        Task<List<MeliStock>> StockPorDepo();
+        Task<List<ProveedorArtSimple>> ProveedorPorArticulo();
+
 
 
 
