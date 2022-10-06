@@ -225,7 +225,9 @@ namespace SC_CRM_API.Repositorio
                             transac.ListaDePedidos.Add(clientes);
                             //cliente escribio bien..pasamos a domicilio
                             //--domicilio
+                            string nombreDelDomicilio = transac.DireccionesDeEntrega.FirstOrDefault().Nombre;
                             List<SqlRespuestaDomicilios> listaDeEscritoDomicilio = new List<SqlRespuestaDomicilios>();
+                            List<SqlRespuestaDomicilios> listadoConloNuevo = new List<SqlRespuestaDomicilios>();
 
                             if (transac.DireccionesDeEntrega.Count > 0)
                             {
@@ -282,6 +284,14 @@ namespace SC_CRM_API.Repositorio
                                 salidaCliente = contextoDeEscritura.SaveChanges();
                                 listaDeEscritoDomicilio = EscribirDomicilioSP(transac.IdGlobal, contextoDeEscritura).ToList();
 
+
+                                //--Modificar para que los domicilios que trajo coincidan unicamente con el pedido actual, si trae demas
+                                //-- tango no va a poder escribir los que ya se encuentren comprometidos con alguna factura
+                                listadoConloNuevo = listaDeEscritoDomicilio.Where(n => n.NombreDomicilio == nombreDelDomicilio).ToList();
+                                //me llevo la lista sin los domicilios previamente utilizados por el cliente
+
+
+
                             }else
                             {
                                 var escritoDomicilio = new SqlRespuesta();
@@ -290,7 +300,7 @@ namespace SC_CRM_API.Repositorio
                             }
 
 
-                            if (string.IsNullOrEmpty(listaDeEscritoDomicilio.First().Comprobante))
+                            if (string.IsNullOrEmpty(listadoConloNuevo.First().Comprobante))
                             {
                                 transac.ListaDeErrores.Add($"Llamada: {metodo} - ERROR SQL: DOMICILIOS");
                                 transac.EscrituraExitosa = false;
@@ -304,14 +314,14 @@ namespace SC_CRM_API.Repositorio
                                 //domicilio escribio bien pasamos al presupuesto
                                 List<string> domiciliosOK = new List<string>();
                                 
-                                foreach (var item in listaDeEscritoDomicilio)
+                                foreach (var item in listadoConloNuevo)
                                 {
                                     domiciliosOK.Add(item.Comprobante);
                                 }
                                 transac.ListaDePedidos.Add(domiciliosOK);
                                 transac.DomicEntregaSave = true;
 
-                                transac.Presupuesto.IdDeSucursal = Convert.ToInt32(listaDeEscritoDomicilio.First().Comprobante); //paso el dato del cliente
+                                transac.Presupuesto.IdDeSucursal = Convert.ToInt32(listadoConloNuevo.First().Comprobante); //paso el dato del cliente
                                 transac.Presupuesto.IdCliente = Convert.ToInt32(escritoCliente.Comprobante); //paso el dato del cliente
 
                                 //--VALIDAR Presupuesto ANTES DE ESCRIBIR--
@@ -331,15 +341,13 @@ namespace SC_CRM_API.Repositorio
                                     detalle.Sucursal = transac.Sucursal;
                                     detalle.IdEvento = transac.IdGlobal;
 
-                                    detalle.CA_IdDireccionEntrega = Convert.ToInt32(listaDeEscritoDomicilio
+                                    detalle.CA_IdDireccionEntrega = Convert.ToInt32(listadoConloNuevo
                                         .Where(d => d.NombreDomicilio == detalle.NombreDomicilio)
                                         .FirstOrDefault().Comprobante.Trim());
 
                                     contextoDeEscritura.Detalles.Add(detalle);
 
                                 }
-
-                              
 
                                 salidaCliente = contextoDeEscritura.SaveChanges();
 
@@ -555,7 +563,8 @@ namespace SC_CRM_API.Repositorio
 
             try
             {
-                spDireccionTango = crmContexto.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_SC_DIRECCION_ENTREGA_Tango '{guid}';").AsEnumerable().ToList();
+                spDireccionTango = crmContexto.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_SC_DIRECCION_ENTREGA_Tango_V2 '{guid}';").AsEnumerable().ToList();
+                //spDireccionTango = crmContexto.Set<SqlRespuesta>().FromSqlRaw($"EXECUTE dbo.SP_SC_DIRECCION_ENTREGA_Tango'{guid}';").AsEnumerable().ToList();
                 listaDeDatos.AddRange(spDireccionTango);
 
             }
