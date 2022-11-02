@@ -10,6 +10,7 @@ namespace SC_CRM_API.Interfaces
     public interface IMiscelaneos
     {
         Task<bool> guardarContactoSinPresupuestoNuevo(string sucursal, TratativaSinPResupuesto datos);
+        Task<bool> ActualizarMeli(Meli_Auxiliar_V2 datos);
         Task<bool> editarContactoSinPresupuestoNuevo(string sucursal, TratativaSinPResupuesto datos);
         Task<List<TratativaSinPResupuesto>> listadoSeguimientosSinPresupuesto(string sucursal, int dias);
     }

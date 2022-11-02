@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SC_CRM_API.Entidades.BaseDeDatos;
 using SC_CRM_API.Entidades.Dtos;
 using SC_CRM_API.Interfaces;
 using System;
@@ -52,6 +53,20 @@ namespace SC_CRM_API.Controllers
             }else
             {
                 var guardarDatos = await _miscs.guardarContactoSinPresupuestoNuevo(sucursal, tratativa);
+                return Ok(guardarDatos);
+
+            }
+        }
+
+        [HttpPost("MELI/ActualizarOrden")]
+        public async Task<IActionResult> actualizarMeli([FromBody] Meli_Auxiliar_V2 orden)
+        {
+
+            if (!ModelState.IsValid)
+                return BadRequest();
+            else
+            {
+                var guardarDatos = await _miscs.ActualizarMeli(orden);
                 return Ok(guardarDatos);
 
             }

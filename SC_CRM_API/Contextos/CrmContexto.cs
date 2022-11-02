@@ -34,6 +34,7 @@ namespace SC_CRM_API.Contextos
         //el sp no devuelve key
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SqlRespuestaNexo>().HasNoKey();
             modelBuilder.Entity<SqlRespuesta>().HasNoKey();
             modelBuilder.Entity<SqlRespuestaDomicilios>().HasNoKey();
             modelBuilder.Entity<SqlRespuestaPlana>().HasNoKey();
@@ -58,6 +59,7 @@ namespace SC_CRM_API.Contextos
         public DbSet<Detalle> Detalles { get; set; }
         public DbSet<DireccionDeEntrega> DireccionDeEntregas { get; set; }
         public DbSet<SqlRespuesta> RespuestaEscritura { get; set; }
+        public DbSet<SqlRespuestaNexo> RespuestaEscrituraNexo { get; set; }
         public DbSet<SqlRespuestaDomicilios> RespuestaEscrituraDeDomicilios { get; set; }
         public DbSet<SqlRespuestaPlana> RespuestaString { get; set; }
 

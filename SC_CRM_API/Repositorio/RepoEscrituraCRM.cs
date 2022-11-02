@@ -655,13 +655,13 @@ namespace SC_CRM_API.Repositorio
 
         }
 
-        public async Task<IEnumerable<SqlRespuesta>> EscribirEnNexoSPAsync(List<NexoEscrituraDTO> listadoaFacturar)
+        public async Task<IEnumerable<SqlRespuestaNexo>> EscribirEnNexoSPAsync(List<NexoEscrituraDTO> listadoaFacturar)
         {
-
+            //*** SOLO MERCADOLIBRE **//
             Sucursal sucursal = await credencialesAsync(listadoaFacturar.First().CodigoSucursal);
 
-            List<SqlRespuesta> respuestas = new List<SqlRespuesta>();
-            var spEscribeCliente = new SqlRespuesta();
+            List<SqlRespuestaNexo> respuestas = new List<SqlRespuestaNexo>();
+            var spEscribeCliente = new SqlRespuestaNexo();
 
             try
             {
@@ -669,42 +669,22 @@ namespace SC_CRM_API.Repositorio
                 {
                     foreach (var item in listadoaFacturar)
                     {
-
-
-                        string query = $"exec SP_TIENDA_NEXO_Magento_Ceravolo_V1 '{item.nroPedido}', {item.talonPed}, '{item.OrdenMagento}', '{item.nroTransaccion}', {item.id_sba22}, {item.cantidadCuotas}, {item.id_sba21};";
-                        var execrespuesta = await contextoDeEscritura.Database.ExecuteSqlRawAsync(query);
-
-                        spEscribeCliente = new SqlRespuesta
-                        {
-                            Resultado = execrespuesta.ToString(),
-                            Comprobante = "",
-                            Fecha = DateTime.Now,
-                            Error_Mensaje = "Bien",
-                            Error_Severidad = "0",
-                            Error_Estado = "0"
-                        };
-
-                        respuestas.Add(spEscribeCliente);
-
+                        string query = $"exec SP_TIENDA_NEXO_MELI_V2 '{item.nroPedido}', {item.talonPed}, '{item.OrdenMagento}', '{item.nroTransaccion}', {item.id_sba22}, null, {item.cantidadCuotas}, {item.id_sba21};";
+                        respuestas = contextoDeEscritura.Set<SqlRespuestaNexo>().FromSqlRaw(query).AsEnumerable().ToList();
                     }
-
-
                 }
 
             }
             catch (Exception error)
             {
-                spEscribeCliente = new SqlRespuesta
+
+                spEscribeCliente = new SqlRespuestaNexo
                 {
-                    Resultado = "Catch",
-                    Comprobante = "",
-                    Fecha = DateTime.Now,
-                    Error_Mensaje = error.Message,
-                    Error_Severidad = "0",
-                    Error_Estado = "0"
+                    Respuesta = -1
                 };
 
                 respuestas.Add(spEscribeCliente);
+                
             }
 
             return respuestas;

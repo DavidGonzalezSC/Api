@@ -51,6 +51,7 @@ namespace SC_CRM_API.Entidades.BaseDeDatos
     public class ProveedorArtSimple //--vive solo en thames
     {
         public string Sku { get; set; }
+        public string Descripcion { get; set; }
         public string Proveedor { get; set; }
         public int? TiempoFabricacion { get; set; }
     }

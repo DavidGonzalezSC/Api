@@ -4,6 +4,13 @@ using System.Text;
 
 namespace SC_CRM_API.Entidades.BaseDeDatos
 {
+
+    public class SqlRespuestaNexo
+    {
+        public int Respuesta { get; set; }
+    }
+
+
     public class SqlRespuesta
     {
 

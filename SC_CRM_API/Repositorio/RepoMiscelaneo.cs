@@ -14,10 +14,35 @@ namespace SC_CRM_API.Repositorio
     public class RepoMiscelaneo : IMiscelaneos
     {
         private readonly IServiciosSucursales _sucursales;
+        private readonly AuxiliarContexto _uxiliarContexto;
 
-        public RepoMiscelaneo(IServiciosSucursales sucursales)
+        public RepoMiscelaneo(IServiciosSucursales sucursales, AuxiliarContexto auxiliarContexto)
         {
             _sucursales = sucursales ?? throw new ArgumentNullException(nameof(IServiciosSucursales));
+            _uxiliarContexto = auxiliarContexto ?? throw new ArgumentNullException(nameof(AuxiliarContexto));
+        }
+
+        public async Task<bool> ActualizarMeli(Meli_Auxiliar_V2 datos)
+        {
+            var busqueda = await _uxiliarContexto.DbMeliV2.Where(d => d.IdOrdenMeli == datos.IdOrdenMeli).FirstOrDefaultAsync();
+
+            if(busqueda != null)
+            {
+                busqueda.Procesado = datos.Procesado;
+                busqueda.Pedido = datos.Pedido;
+
+                _uxiliarContexto.Update(busqueda);
+                var guardo = await _uxiliarContexto.SaveChangesAsync();
+                if (guardo > 0)
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                return false;
+            }
+            
         }
 
         public async Task<Sucursal> credencialesAsync(string sucursal)

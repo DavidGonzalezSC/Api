@@ -32,6 +32,6 @@ namespace SC_CRM_API.Interfaces
 
 
         //--Escribir en Nexo
-        public Task<IEnumerable<SqlRespuesta>> EscribirEnNexoSPAsync(List<NexoEscrituraDTO> listadoaFacturar);
+        public Task<IEnumerable<SqlRespuestaNexo>> EscribirEnNexoSPAsync(List<NexoEscrituraDTO> listadoaFacturar);
     }
 }
