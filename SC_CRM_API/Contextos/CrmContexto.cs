@@ -16,7 +16,8 @@ namespace SC_CRM_API.Contextos
 
         public CrmContexto(Sucursal sucursal)
         {
-            this.Servidor = sucursal.Servidor;
+            //this.Servidor = sucursal.Servidor;
+            this.Servidor = "10.100.5.4";
             this.Usuario = sucursal.Usuario;
             this.Password = sucursal.Clave;
             this.Catalogo = sucursal.Base;
